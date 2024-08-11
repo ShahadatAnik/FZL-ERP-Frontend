@@ -18,22 +18,6 @@ export const orderQK = {
 	// buyers
 	buyers: () => [...orderQK.all(), 'buyer'], // [order, buyer]
 	buyer: (uuid) => [...orderQK.buyers(), uuid], // [order, buyer, uuid]
-};
-
-export const adminQK = {
-	all: () => ['admin'],
-
-	// departments
-	departments: () => [...adminQK.all(), 'departments'],
-	department: (uuid) => [...adminQK.departments(), uuid],
-
-	// designation
-	designations: () => [...adminQK.all(), 'designations'],
-	designation: (uuid) => [...adminQK.designations(), uuid],
-
-	// users
-	users: () => [...adminQK.all(), 'users'],
-	user: (uuid) => [...adminQK.users(), uuid],
 
 	// marketing
 	marketings: () => [...orderQK.all(), 'marketing'],
@@ -56,6 +40,22 @@ export const adminQK = {
 	// info
 	info: () => [...orderQK.all(), 'info'],
 	infoByUUID: (uuid) => [...orderQK.info(), uuid],
+};
+
+export const adminQK = {
+	all: () => ['admin'],
+
+	// departments
+	departments: () => [...adminQK.all(), 'departments'],
+	department: (uuid) => [...adminQK.departments(), uuid],
+
+	// designation
+	designations: () => [...adminQK.all(), 'designations'],
+	designation: (uuid) => [...adminQK.designations(), uuid],
+
+	// users
+	users: () => [...adminQK.all(), 'users'],
+	user: (uuid) => [...adminQK.users(), uuid],
 };
 
 export const commercialQK = {

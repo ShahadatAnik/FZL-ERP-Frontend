@@ -18,6 +18,8 @@ import {
 	PHONE_NUMBER_REQUIRED, // default
 	STRING, // default
 	STRING_REQUIRED, // default
+	URL_REQUIRED, // default
+	UUID_PK, // default
 } from './utils';
 
 export {
