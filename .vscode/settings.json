@@ -1,0 +1,345 @@
+{
+	// need to install the following extensions
+	// 1. Bracket Pair Colorizer 2
+	// 2. Code Runner
+	// 3. Code Spell Checker
+	// 4. Copilot
+	// 5. DotENV
+	// 6. EditorConfig for VS Code
+	// 7. ESLint
+	// 8. GitHub Pull Requests and Issues
+	// 9. Live Server
+	// 10. Live Share
+	// 11. Prettier - Code formatter
+
+	// editor
+	"editor.suggestSelection": "first",
+	"editor.accessibilityPageSize": 16,
+	"editor.formatOnSave": true,
+	"editor.formatOnPaste": true,
+	"editor.fontFamily": "'Fira Code'",
+	// "editor.fontFamily": 'Cascadia Code', 'CaskaydiaMono Nerd Font', 'CaskaydiaCove Nerd Font Mono', 'FiraCode Nerd Font', \"Fira Code\", Consolas, 'Courier New', monospace",
+	"editor.fontSize": 14,
+	"editor.fontWeight": 380,
+	"editor.fontLigatures": true,
+	"editor.lineHeight": 18,
+	"editor.linkedEditing": true,
+	"editor.renderWhitespace": "none",
+	"editor.minimap.enabled": false,
+	"editor.renderControlCharacters": false,
+	"editor.inlineSuggest.enabled": true,
+	"editor.wordWrap": "on",
+	"editor.guides.bracketPairs": true,
+	"editor.stickyScroll.enabled": true,
+	"editor.cursorBlinking": "smooth",
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"editor.unicodeHighlight.allowedCharacters": {
+		"৪": true
+	},
+	"editor.mouseWheelZoom": true,
+	"editor.codeActionsOnSave": {
+		"source.fixAll": "explicit",
+		"source.sortImports": "explicit"
+	},
+	"breadcrumbs.enabled": false,
+	"explorer.confirmDragAndDrop": false,
+	"[css]": {
+		"editor.suggest.insertMode": "replace"
+	},
+	"editor.quickSuggestions": {
+		"strings": "on"
+	},
+
+	// terminal
+	"terminal.integrated.cursorStyle": "line",
+	"terminal.integrated.gpuAcceleration": "auto",
+	"terminal.integrated.fontFamily": "'Fira Code'",
+	"terminal.integrated.defaultProfile.windows": "PowerShell",
+	"terminal.integrated.profiles.windows": {
+		"PowerShell": {
+			"source": "PowerShell",
+			"icon": "terminal-powershell",
+			"path": [
+				"${env:windir}\\Sysnative\\WindowsPowerShell\\v1.0\\powershell.exe",
+				"${env:windir}\\System32\\WindowsPowerShell\\v1.0\\powershell.exe"
+			]
+		},
+		"Command Prompt": {
+			"path": ["${env:windir}\\Sysnative\\cmd.exe", "${env:windir}\\System32\\cmd.exe"],
+			"args": [],
+			"icon": "terminal-cmd"
+		}
+	},
+
+	// workbench
+	"workbench.startupEditor": "none",
+	"workbench.iconTheme": "a-file-icon-vscode",
+	"security.workspace.trust.untrustedFiles": "open",
+	"workbench.colorCustomizations": {},
+	"workbench.editorAssociations": {
+		"*.sketch_miner": "default"
+	},
+
+	// prettier
+	"prettier.tabWidth": 4,
+	"prettier.useTabs": true,
+
+	// git
+	"git.confirmSync": false,
+	"git.enableSmartCommit": true,
+	"githubPullRequests.fileListLayout": "flat",
+	"githubPullRequests.pullBranch": "never",
+	"github.copilot.advanced": {},
+	"github.copilot.enable": {
+		"*": true,
+		"plaintext": true,
+		"markdown": true,
+		"scminput": false,
+		"yaml": true,
+		"php": true,
+		"html": true,
+		"javascript": true,
+		"javascriptreact": true,
+		"json": true,
+		"jsonc": true,
+		"css": true,
+		"scss": true,
+		"less": true,
+		"python": true,
+		"typescript": true,
+		"typescriptreact": true,
+		"blade": true,
+		"c": true,
+		"cpp": true,
+		"csharp": true,
+		"dart": true,
+		"dockerfile": true,
+		"go": true,
+		"java": true,
+		"kotlin": true,
+		"lua": true,
+		"objective-c": true,
+		"objective-cpp": true,
+		"perl": true,
+		"perl6": true,
+		"powershell": true,
+		"r": true,
+		"ruby": true,
+		"rust": true,
+		"swift": true,
+		"vb": true,
+		"xml": true,
+		"xsl": true,
+		"django-html": true,
+		"jinja-html": true,
+		"svg": true
+	},
+
+	// Tailwind CSS IntelliSense
+	"tailwindCSS.experimental.classRegex": [
+		["clsx\\(([^)]*)\\)", "(?:'|\"|`)([^\"'`]*)(?:'|\"|`)"],
+		["clsx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"],
+		["tw\\(([^)]*)\\)", "(?:'|\"|`)([^\"'`]*)(?:'|\"|`)"],
+		["tw\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
+	],
+	"tailwindCSS.classAttributes": ["class", "className", "ngClass", "clsx", "tw"],
+
+	// important
+	"liveServer.settings.donotShowInfoMsg": true,
+	"code-runner.runInTerminal": true,
+	"files.associations": {
+		"*.js": "javascript",
+		"*.php": "blade",
+		"*.blade.php": "blade",
+		"*.tpl": "html",
+		"**/templates/**/*.html": "jinja-html",
+		"*.html": "html",
+		"*.css": "tailwindcss"
+	},
+	"files.autoSave": "afterDelay",
+
+	"cSpell.userWords": [
+		"Abha",
+		"adpyke",
+		"Agrabad",
+		"Anik",
+		"AQUALAC",
+		"Ashulia",
+		"Aukpara",
+		"autopep",
+		"BRAC",
+		"Cascadia",
+		"Caskaydia",
+		"CGPA",
+		"chakra",
+		"challan",
+		"charpotro",
+		"Chattogram",
+		"CHEMTIN",
+		"clsx",
+		"cmnt",
+		"Consolas",
+		"CORI",
+		"coribake",
+		"CROI",
+		"daisyui",
+		"datepicker",
+		"Dianix",
+		"donot",
+		"dotnettools",
+		"dynamicerror",
+		"esbenp",
+		"fileupload",
+		"Fira",
+		"fortunezip",
+		"GETSAL",
+		"Ghor",
+		"Groclear",
+		"halign",
+		"headlessui",
+		"heroicons",
+		"hookform",
+		"hscode",
+		"ibfk",
+		"IFNULL",
+		"ILMIYAH",
+		"Inno",
+		"Invalon",
+		"Islami",
+		"Kaderia",
+		"kapashia",
+		"kelbd",
+		"Kuno",
+		"Laravel",
+		"LPAD",
+		"Narsingdi",
+		"openapi",
+		"oraclesql",
+		"Paharika",
+		"Parens",
+		"Qirwan",
+		"Qurwan",
+		"revealjs",
+		"runserver",
+		"Savar",
+		"scminput",
+		"Shahadat",
+		"Shahjalal",
+		"SIBL",
+		"Signup",
+		"sqltools",
+		"Stannate",
+		"STARTERCONF",
+		"stss",
+		"swadesh",
+		"Sylhet",
+		"Sysnative",
+		"Taicron",
+		"tailwindcss",
+		"tanstack",
+		"Terasil",
+		"Texport",
+		"toastify",
+		"todohighlight",
+		"Trisodium",
+		"ULTRABRITE",
+		"Uvitex",
+		"venv",
+		"Vislon",
+		"vodf",
+		"windir",
+		"xoss"
+	],
+
+	// js
+	"javascript.updateImportsOnFileMove.enabled": "always",
+	"emmet.includeLanguages": {
+		"javascript": "javascriptreact"
+	},
+	"git.openRepositoryInParentFolders": "never",
+
+	"[python]": {
+		"editor.defaultFormatter": "ms-python.autopep8"
+	},
+	"terminal.integrated.env.windows": {},
+	"prettier.vueIndentScriptAndStyle": true,
+	"[sql]": {
+		"editor.defaultFormatter": "cweijan.vscode-mysql-client2",
+		"editor.formatOnSave": true,
+		"editor.formatOnPaste": true
+	},
+	"markdown-preview-enhanced.revealjsTheme": "blood.css",
+	"githubPullRequests.createOnPublishBranch": "never",
+	"database-client.splitSQLByNewLine": false,
+	"database-client.showTrigger": true,
+	"database-client.saveConnectionExpandedState": true,
+	"[csharp]": {
+		"editor.defaultFormatter": "ms-dotnettools.csharp",
+		"editor.formatOnSave": true,
+		"editor.formatOnPaste": true
+	},
+	"typescript.updateImportsOnFileMove.enabled": "always",
+	"workbench.colorTheme": "Andromeda Italic Bordered",
+	"diffEditor.maxComputationTime": 0,
+	"tailwind-fold.autoFold": false,
+	"scm.showIncomingChanges": "always",
+	"editor.cursorSmoothCaretAnimation": "on",
+	"[oraclesql]": {
+		"editor.suggest.showSnippets": true,
+		"editor.quickSuggestions": {
+			"comments": "on",
+			"strings": "on",
+			"other": "on"
+		}
+	},
+	"github.copilot.editor.enableAutoCompletions": true,
+	"workbench.productIconTheme": "a-file-icon-vscode-product-icon-theme",
+	"diffEditor.ignoreTrimWhitespace": true,
+	"diffEditor.hideUnchangedRegions.enabled": true,
+
+	// todo highlight
+	"todohighlight.keywords": [
+		"FIXME:", // without further details, this will use the defaultStyle
+		"REVIEW:", // as will this
+		// now for a more complex example
+		{
+			"text": "INFO:", // without a defined regex pattern this is the string that will be matched
+			"color": "black",
+			"backgroundColor": "#90e0ef",
+			"borderRadius": "2px",
+			"isWholeLine": false,
+			"overviewRulerColor": "grey",
+			"diagnosticSeverity": "information"
+		},
+		{
+			"text": "WARNING:",
+			"before": {
+				"contentText": "⚠️" // adds text before the highlight
+			},
+			"color": "white",
+			"backgroundColor": "red",
+			"borderRadius": "2px",
+			"diagnosticSeverity": "warning" // Set diagnostic severity to `none`, `information`, `warning` or `error`
+		},
+		{
+			"text": "TODO(string):", // with a regex pattern defined, this setting isn't used, but is useful as a name for this section
+			"regex": {
+				"pattern": "(?<=^|\"|\\s)TODO(\\(\\w+\\))?:" // this allows for TODO: or TODO(Bob): etc.
+			},
+			"color": "black",
+			"backgroundColor": "#ffd449",
+			"borderRadius": "2px" //NOTE: use borderRadius along with `border` or you will see nothing change
+		},
+		{
+			"text": "NOTE:",
+			"color": "white",
+			"backgroundColor": "#5e503f",
+			"borderRadius": "2px",
+			// "overviewRulerColor": "grey",
+			"regex": {
+				"pattern": "(?<=^|\"|\\s)NOTE[:]?(?!\\w)" // in this example, highlight `NOTE:` with or without the `:` and that's not
+			},
+			"isWholeLine": false
+		}
+	]
+}

@@ -1,6 +1,7 @@
 import { Suspense } from '@/components/Feedback';
 import ReactTable from '@/components/Table';
 import { useAccess, useFetchFunc } from '@/hooks';
+import { useOrderInfo } from '@/state/Order';
 import { DateTime, EditDelete, LinkWithCopy, StatusButton } from '@/ui';
 import PageInfo from '@/util/PageInfo';
 import { lazy, useEffect, useMemo, useState } from 'react';
@@ -9,12 +10,10 @@ const AddOrUpdate = lazy(() => import('./AddOrUpdate'));
 const DeleteModal = lazy(() => import('@/components/Modal/Delete'));
 
 export default function Index() {
-	const info = new PageInfo('Order Info', 'order/info', 'order__info');
-	const haveAccess = useAccess('order__info');
-
-	const [orderInfo, setOrderInfo] = useState([]);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState(null);
+	const { data, isLoading, url, deleteData } = useOrderInfo();
+	const info = new PageInfo('Order Info', url, 'order__info');
+	const haveAccess = useAccess(info.getTab());
+	
 
 	const columns = useMemo(
 		() => [
@@ -129,7 +128,9 @@ export default function Index() {
 				header: 'Actions',
 				enableColumnFilter: false,
 				enableSorting: false,
-				hidden: !haveAccess.includes('update'),
+				hidden:
+					!haveAccess.includes('update') &&
+					!haveAccess.includes('delete'),
 				width: 'w-24',
 				cell: (info) => {
 					return (
@@ -137,19 +138,19 @@ export default function Index() {
 							idx={info.row.index}
 							handelUpdate={handelUpdate}
 							handelDelete={handelDelete}
+							showEdit={haveAccess.includes('update')}
 							showDelete={haveAccess.includes('delete')}
 						/>
 					);
 				},
 			},
 		],
-		[orderInfo]
+		[data]
 	);
 
 	// Fetching data from server
 	useEffect(() => {
 		document.title = info.getTabName();
-		useFetchFunc(info.getFetchUrl(), setOrderInfo, setLoading, setError);
 	}, []);
 
 	// Add
@@ -159,22 +160,22 @@ export default function Index() {
 
 	// Update
 	const [updateOrderInfo, setUpdateOrderInfo] = useState({
-		id: null,
+		uuid: null,
 		order_number: null,
-		reference_order: null,
-		party_id: null,
-		buyer_id: null,
-		merchandiser_id: null,
-		marketing_id: null,
-		factory_id: null,
-		issued_by_id: null,
+		reference_order_info_uuid: null,
+		party_uuid: null,
+		buyer_uuid: null,
+		merchandiser_uuid: null,
+		marketing_uuid: null,
+		factory_uuid: null,
+		issued_by_uuid: null,
 	});
 
 	const handelUpdate = (idx) => {
-		const prevData = orderInfo[idx];
+		// const prevData = orderInfo[idx];
 		setUpdateOrderInfo((prev) => ({
 			...prev,
-			...prevData,
+			uuid: data[idx].uuid,
 		}));
 		window[info.getAddOrUpdateModalId()].showModal();
 	};
@@ -187,14 +188,14 @@ export default function Index() {
 	const handelDelete = (idx) => {
 		setDeleteItem((prev) => ({
 			...prev,
-			itemId: orderInfo[idx].id,
-			itemName: orderInfo[idx].order_number,
+			itemId: data[idx].uuid,
+			itemName: data[idx].order_number,
 		}));
 
 		window[info.getDeleteModalId()].showModal();
 	};
 
-	if (loading)
+	if (isLoading)
 		return <span className='loading loading-dots loading-lg z-50' />;
 	// if (error) return <h1>Error:{error}</h1>;
 
@@ -204,7 +205,7 @@ export default function Index() {
 				title={info.getTitle()}
 				handelAdd={handelAdd}
 				accessor={haveAccess.includes('create')}
-				data={orderInfo}
+				data={data}
 				columns={columns}
 				extraClass='py-2'
 			/>
@@ -213,7 +214,6 @@ export default function Index() {
 				<AddOrUpdate
 					modalId={info.getAddOrUpdateModalId()}
 					{...{
-						setOrderInfo,
 						updateOrderInfo,
 						setUpdateOrderInfo,
 					}}
@@ -223,10 +223,12 @@ export default function Index() {
 				<DeleteModal
 					modalId={info.getDeleteModalId()}
 					title={info.getTitle()}
-					deleteItem={deleteItem}
-					setDeleteItem={setDeleteItem}
-					setItems={setOrderInfo}
-					uri={info.getDeleteUrl()}
+					{...{
+						deleteItem,
+						setDeleteItem,
+						url,
+						deleteData,
+					}}
 				/>
 			</Suspense>
 		</div>

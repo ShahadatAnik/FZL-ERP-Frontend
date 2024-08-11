@@ -1,31 +1,37 @@
-import { AddModal } from "@/components/Modal";
-import { useAuth } from "@/context/auth";
+import { AddModal } from '@/components/Modal';
+import { useAuth } from '@/context/auth';
 import {
 	useFetch,
 	useFetchForRhfReset,
 	usePostFunc,
 	useRHF,
 	useUpdateFunc,
-} from "@/hooks";
-import { CheckBox, FormField, ReactSelect } from "@/ui";
-import GetDateTime from "@/util/GetDateTime";
-import { ORDER_INFO_NULL, ORDER_INFO_SCHEMA } from "@util/Schema";
-import { useEffect, useState } from "react";
+} from '@/hooks';
+import nanoid from '@/lib/nanoid';
+import { useOrderInfo } from '@/state/Order';
+import { CheckBox, FormField, ReactSelect } from '@/ui';
+import GetDateTime from '@/util/GetDateTime';
+import { DevTool } from '@hookform/devtools';
+import { ORDER_INFO_NULL, ORDER_INFO_SCHEMA } from '@util/Schema';
+import { useEffect, useState } from 'react';
 
 export default function Index({
-	modalId = "",
-	setOrderInfo,
+	modalId = '',
+
 	updateOrderInfo = {
-		id: null,
-		party_id: null,
-		buyer_id: null,
-		merchandiser_id: null,
-		marketing_id: null,
-		factory_id: null,
-		issued_by_id: null,
+		uuid: null,
+		order_number: null,
+		reference_order_info_uuid: null,
+		party_uuid: null,
+		buyer_uuid: null,
+		merchandiser_uuid: null,
+		marketing_uuid: null,
+		factory_uuid: null,
+		issued_by_uuid: null,
 	},
 	setUpdateOrderInfo,
 }) {
+	const { url, updateData, postData } = useOrderInfo();
 	const { user } = useAuth();
 	const {
 		register,
@@ -37,55 +43,57 @@ export default function Index({
 		getValues,
 	} = useRHF(ORDER_INFO_SCHEMA, ORDER_INFO_NULL);
 
-	const [partyId, setPartyId] = useState(getValues("party_id"));
-	const { value: ref_order } = useFetch("/order/info/value/label");
-	const { value: party } = useFetch("/party/value/label");
-	const { value: buyer } = useFetch("/buyer/value/label");
-	const { value: marketing } = useFetch("/marketing/value/label");
+	const [partyId, setPartyId] = useState(getValues('party_uuid'));
+	const { value: ref_order } = useFetch('/other/order/info/value/label');
+	const { value: party } = useFetch('/other/party/value/label');
+	const { value: buyer } = useFetch('/other/buyer/value/label');
+	const { value: marketing } = useFetch('/other/marketing/value/label');
 	const { value: merchandiser } = useFetch(
-		`/merchandiser/value/label/${partyId}`,
+		`/other/merchandiser/value/label/${partyId}`,
 		[partyId]
 	);
-	const { value: factory } = useFetch(`/factory/value/label/${partyId}`, [
-		partyId,
-	]);
+	const { value: factory } = useFetch(
+		`/other/factory/value/label/${partyId}`,
+		[partyId]
+	);
 
 	const getResult = (key) =>
-		typeof getValues(key) !== "boolean" && getValues(key) === 1
+		typeof getValues(key) !== 'boolean' && getValues(key) === 1
 			? true
 			: false;
 
-	const [isSample, setIsSample] = useState(getResult("is_sample"));
-	const [isBill, setIsBill] = useState(getResult("is_bill"));
+	const [isSample, setIsSample] = useState(getResult('is_sample'));
+	const [isBill, setIsBill] = useState(getResult('is_bill'));
 
 	const CashOptions = [
-		{ value: 1, label: "Cash" },
-		{ value: 0, label: "LC" },
+		{ value: 1, label: 'Cash' },
+		{ value: 0, label: 'LC' },
 	];
 
 	const PriorityOptions = [
-		{ value: "FIFO", label: "FIFO" },
-		{ value: "URGENT", label: "URGENT" },
-		{ value: "---", label: "---" },
+		{ value: 'FIFO', label: 'FIFO' },
+		{ value: 'URGENT', label: 'URGENT' },
+		{ value: '---', label: '---' },
 	];
 
 	useFetchForRhfReset(
-		`/order/info/${updateOrderInfo?.id}`,
-		updateOrderInfo?.id,
+		`${url}/${updateOrderInfo?.uuid}`,
+		updateOrderInfo?.uuid,
 		reset
 	);
 
 	const onClose = () => {
 		setUpdateOrderInfo((prev) => ({
 			...prev,
-			id: null,
-			party_id: null,
-			buyer_id: null,
-			merchandiser_id: null,
-			marketing_id: null,
-			factory_id: null,
-			issued_by_id: null,
-			reference_order: null,
+			uuid: null,
+			order_number: null,
+			reference_order_info_uuid: null,
+			party_uuid: null,
+			buyer_uuid: null,
+			merchandiser_uuid: null,
+			marketing_uuid: null,
+			factory_uuid: null,
+			issued_by_uuid: null,
 		}));
 		reset(ORDER_INFO_NULL);
 		window[modalId].close();
@@ -93,269 +101,251 @@ export default function Index({
 
 	const onSubmit = async (data) => {
 		// Update item
-		if (updateOrderInfo?.id !== null) {
+		if (
+			updateOrderInfo?.uuid !== null &&
+			updateOrderInfo?.uuid !== undefined
+		) {
 			const updatedData = {
 				...data,
+				is_sample: isSample ? 1 : 0,
+				is_bill: isBill ? 1 : 0,
+				is_cash: data.is_cash ? 1 : 0,
+				status: data.status ? 1 : 0,
 				updated_at: GetDateTime(),
 			};
-			await useUpdateFunc({
-				uri: `/order/info/${updateOrderInfo?.id}/${updateOrderInfo?.order_number}`,
-				itemId: updateOrderInfo?.id,
-				data: data,
-				updatedData: updatedData,
-				setItems: setOrderInfo,
+
+			await updateData.mutateAsync({
+				url: `${url}/${updateOrderInfo?.uuid}`,
+				uuid: updateOrderInfo?.uuid,
+				updatedData,
 				onClose: onClose,
 			});
 
 			return;
 		}
 
-		// Create maps
-		const buyerMap = new Map(buyer.map((item) => [item.value, item.label]));
-		const partyMap = new Map(party.map((item) => [item.value, item.label]));
-		const marketingMap = new Map(
-			marketing.map((item) => [item.value, item.label])
-		);
-		const merchandiserMap = new Map(
-			merchandiser.map((item) => [item.value, item.label])
-		);
-		const factoryMap = new Map(
-			factory.map((item) => [item.value, item.label])
-		);
-
 		const updatedData = {
 			...data,
+			uuid: nanoid(),
 			is_sample: isSample ? 1 : 0,
 			is_bill: isBill ? 1 : 0,
 			is_cash: data.is_cash ? 1 : 0,
-			issued_by: user?.id,
+			status: 0,
+			created_by: user?.uuid,
 			created_at: GetDateTime(),
-			buyer_name: buyerMap.get(data.buyer_id),
-			party_name: partyMap.get(data.party_id),
-			marketing_name: marketingMap.get(data.marketing_id),
-			merchandiser_name: merchandiserMap.get(data.merchandiser_id),
-			factory_name: factoryMap.get(data.factory_id),
-			issued_by_name: user?.name,
 		};
 
-		await usePostFunc({
-			uri: "/order/info",
-			data: updatedData,
-			setItems: setOrderInfo,
-			onClose: onClose,
+		await postData.mutateAsync({
+			url,
+			newData: updatedData,
+			onClose,
 		});
-		window.location.reload(true);
+
+		// window.location.reload(true);
 	};
 
 	useEffect(() => {
-		setPartyId(getValues("party_id"));
-	}, [getValues("party_id")]);
+		setPartyId(getValues('party_uuid'));
+	}, [getValues('party_uuid')]);
 
 	return (
 		<AddModal
 			id={modalId}
 			title={
-				updateOrderInfo?.id !== null
-					? "Order Info: " + updateOrderInfo?.order_number
-					: "Order Info"
+				updateOrderInfo?.uuid !== null
+					? 'Order Info: ' + updateOrderInfo?.order_number
+					: 'Order Info'
 			}
 			onSubmit={handleSubmit(onSubmit)}
 			onClose={onClose}
 			// isSmall={true}
 		>
-			<div className="flex justify-end gap-2 p-2 text-sm">
-				<div className="rounded-md bg-primary px-1">
+			<div className='flex justify-end gap-2 p-2 text-sm'>
+				<div className='rounded-md bg-primary px-1'>
 					<CheckBox
-						label="is_sample"
-						title="Sample"
-						text="text-primary-content"
+						label='is_sample'
+						title='Sample'
+						text='text-primary-content'
 						defaultChecked={isSample}
 						onChange={(e) => setIsSample(e.target.checked)}
 						{...{ register, errors }}
 					/>
 				</div>
-				<div className="rounded-md bg-primary px-1">
+				<div className='rounded-md bg-primary px-1'>
 					<CheckBox
-						title="Bill"
-						label="is_bill"
-						text="text-primary-content"
+						title='Bill'
+						label='is_bill'
+						text='text-primary-content'
 						defaultChecked={isBill}
 						onChange={(e) => setIsBill(e.target.checked)}
 						{...{ register, errors }}
 					/>
 				</div>
 			</div>
-			<div className="flex flex-col gap-1 md:flex-row">
+			<div className='flex flex-col gap-1 md:flex-row'>
 				<FormField
-					label="reference_order"
-					title="Ref. Order"
-					errors={errors}
-				>
+					label='reference_order_info_uuid'
+					title='Ref. Order'
+					errors={errors}>
 					<Controller
-						name={"reference_order"}
+						name={'reference_order_info_uuid'}
 						control={control}
 						render={({ field: { onChange } }) => {
 							return (
 								<ReactSelect
-									placeholder="Select Order"
+									placeholder='Select Order'
 									options={ref_order}
 									value={ref_order?.find(
 										(item) =>
 											item.value ==
-											getValues("reference_order")
+											getValues(
+												'reference_order_info_uuid'
+											)
 									)}
-									onChange={(e) =>
-										onChange(parseInt(e.value))
-									}
-									isDisabled={updateOrderInfo?.id !== null}
+									onChange={(e) => onChange(e.value)}
+									isDisabled={updateOrderInfo?.uuid !== null}
 								/>
 							);
 						}}
 					/>
 				</FormField>
 				<FormField
-					label="marketing_id"
-					title="Marketing"
-					errors={errors}
-				>
+					label='marketing_uuid'
+					title='Marketing'
+					errors={errors}>
 					<Controller
-						name={"marketing_id"}
+						name={'marketing_uuid'}
 						control={control}
 						render={({ field: { onChange } }) => {
 							return (
 								<ReactSelect
-									placeholder="Select Marketing"
+									placeholder='Select Marketing'
 									options={marketing}
 									value={marketing?.find(
 										(item) =>
 											item.value ==
-											getValues("marketing_id")
+											getValues('marketing_uuid')
 									)}
-									onChange={(e) =>
-										onChange(parseInt(e.value))
-									}
-									isDisabled={updateOrderInfo?.id !== null}
+									onChange={(e) => onChange(e.value)}
+									isDisabled={updateOrderInfo?.uuid !== null}
 								/>
 							);
 						}}
 					/>
 				</FormField>
-				<FormField label="buyer_id" title="Buyer" errors={errors}>
+				<FormField label='buyer_uuid' title='Buyer' errors={errors}>
 					<Controller
-						name={"buyer_id"}
+						name={'buyer_uuid'}
 						control={control}
 						render={({ field: { onChange } }) => {
 							return (
 								<ReactSelect
-									placeholder="Select Buyer"
+									placeholder='Select Buyer'
 									options={buyer}
 									value={buyer?.find(
 										(item) =>
-											item.value == getValues("buyer_id")
+											item.value ==
+											getValues('buyer_uuid')
 									)}
-									onChange={(e) =>
-										onChange(parseInt(e.value))
-									}
-									isDisabled={updateOrderInfo?.id !== null}
+									onChange={(e) => onChange(e.value)}
+									isDisabled={updateOrderInfo?.uuid !== null}
 								/>
 							);
 						}}
 					/>
 				</FormField>
 			</div>
-			<div className="flex flex-col gap-1 md:flex-row">
-				<FormField label="party_id" title="Party" errors={errors}>
+			<div className='flex flex-col gap-1 md:flex-row'>
+				<FormField label='party_uuid' title='Party' errors={errors}>
 					<Controller
-						name={"party_id"}
+						name={'party_uuid'}
 						control={control}
 						render={({ field: { onChange } }) => {
 							return (
 								<ReactSelect
-									placeholder="Select Party"
+									placeholder='Select Party'
 									options={party}
 									value={party?.find(
 										(item) =>
-											item.value == getValues("party_id")
+											item.value ==
+											getValues('party_uuid')
 									)}
 									onChange={(e) => {
-										onChange(parseInt(e.value));
-										setPartyId(parseInt(e.value));
+										onChange(e.value);
+										setPartyId(e.value);
 									}}
-									isDisabled={updateOrderInfo?.id !== null}
+									isDisabled={updateOrderInfo?.uuid !== null}
 								/>
 							);
 						}}
 					/>
 				</FormField>
 				<FormField
-					label="merchandiser_id"
-					title="Merchandiser"
-					errors={errors}
-				>
+					label='merchandiser_uuid'
+					title='Merchandiser'
+					errors={errors}>
 					<Controller
-						name={"merchandiser_id"}
+						name={'merchandiser_uuid'}
 						control={control}
 						render={({ field: { onChange } }) => {
 							return (
 								<ReactSelect
-									placeholder="Select Merchandiser"
+									placeholder='Select Merchandiser'
 									options={merchandiser}
 									value={merchandiser?.find(
 										(item) =>
 											item.value ==
-											getValues("merchandiser_id")
+											getValues('merchandiser_uuid')
 									)}
 									onChange={(e) => {
-										onChange(parseInt(e.value));
+										onChange(e.value);
 									}}
-									isDisabled={updateOrderInfo?.id !== null}
+									isDisabled={updateOrderInfo?.uuid !== null}
 								/>
 							);
 						}}
 					/>
 				</FormField>
-				<FormField label="factory_id" title="Factory" errors={errors}>
+				<FormField label='factory_uuid' title='Factory' errors={errors}>
 					<Controller
-						name={"factory_id"}
+						name={'factory_uuid'}
 						control={control}
 						render={({ field: { onChange } }) => {
 							return (
 								<ReactSelect
-									placeholder="Select Factory"
+									placeholder='Select Factory'
 									options={factory}
 									value={factory?.find(
 										(item) =>
 											item.value ==
-											getValues("factory_id")
+											getValues('factory_uuid')
 									)}
 									onChange={(e) => {
-										onChange(parseInt(e.value));
+										onChange(e.value);
 									}}
-									isDisabled={updateOrderInfo?.id !== null}
+									isDisabled={updateOrderInfo?.uuid !== null}
 								/>
 							);
 						}}
 					/>
 				</FormField>
 			</div>
-			<div className="flex flex-col gap-1 md:flex-row">
-				<FormField label="is_cash" title="Cash / LC" errors={errors}>
+			<div className='flex flex-col gap-1 md:flex-row'>
+				<FormField label='is_cash' title='Cash / LC' errors={errors}>
 					<Controller
-						name={"is_cash"}
+						name={'is_cash'}
 						control={control}
 						render={({ field: { onChange } }) => {
 							return (
 								<ReactSelect
-									placeholder="Select Cash Or LC"
+									placeholder='Select Cash Or LC'
 									options={CashOptions}
 									value={CashOptions?.find(
 										(CashOptions) =>
 											CashOptions.value ==
-											getValues("is_cash")
+											getValues('is_cash')
 									)}
-									onChange={(e) =>
-										onChange(parseInt(e.value))
-									}
+									onChange={(e) => onChange(e.value)}
 									// isDisabled={updateOrderInfo?.id !== null}
 								/>
 							);
@@ -363,22 +353,21 @@ export default function Index({
 					/>
 				</FormField>
 				<FormField
-					label="marketing_priority"
-					title="S&M Priority"
-					errors={errors}
-				>
+					label='marketing_priority'
+					title='S&M Priority'
+					errors={errors}>
 					<Controller
-						name={"marketing_priority"}
+						name={'marketing_priority'}
 						control={control}
 						render={({ field: { onChange } }) => {
 							return (
 								<ReactSelect
-									placeholder="Select Priority"
+									placeholder='Select Priority'
 									options={PriorityOptions}
 									value={PriorityOptions?.find(
 										(item) =>
 											item.value ==
-											getValues("marketing_priority")
+											getValues('marketing_priority')
 									)}
 									onChange={(e) => onChange(e.value)}
 									// isDisabled={
@@ -391,22 +380,21 @@ export default function Index({
 				</FormField>
 
 				<FormField
-					label="factory_priority"
-					title="Factory Priority"
-					errors={errors}
-				>
+					label='factory_priority'
+					title='Factory Priority'
+					errors={errors}>
 					<Controller
-						name={"factory_priority"}
+						name={'factory_priority'}
 						control={control}
 						render={({ field: { onChange } }) => {
 							return (
 								<ReactSelect
-									placeholder="Select Priority"
+									placeholder='Select Priority'
 									options={PriorityOptions}
 									value={PriorityOptions?.find(
 										(item) =>
 											item.value ==
-											getValues("factory_priority")
+											getValues('factory_priority')
 									)}
 									onChange={(e) => onChange(e.value)}
 									// isDisabled={
@@ -418,6 +406,7 @@ export default function Index({
 					/>
 				</FormField>
 			</div>
+			<DevTool control={control} placement='top-left' />
 		</AddModal>
 	);
 }

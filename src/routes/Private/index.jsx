@@ -48,7 +48,10 @@ function FilteredRoutes() {
 				user_access[page_name]?.includes("read"))
 	);
 
-	return filteredRoutes;
+	
+
+	// return filteredRoutes;
+	return PRIVATE_ROUTES;
 }
 
 export { FilteredRoutes, PRIVATE_ROUTES };

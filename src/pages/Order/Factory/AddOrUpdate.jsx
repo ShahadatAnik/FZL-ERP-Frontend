@@ -1,23 +1,20 @@
-import { AddModal } from "@/components/Modal";
-import {
-	useFetch,
-	useFetchForRhfReset,
-	usePostFunc,
-	useRHF,
-	useUpdateFunc,
-} from "@/hooks";
-import { FormField, Input, ReactSelect, Textarea } from "@/ui";
-import GetDateTime from "@/util/GetDateTime";
-import { FACTORY_NULL, FACTORY_SCHEMA } from "@util/Schema";
+import { AddModal } from '@/components/Modal';
+import { useFetch, useFetchForRhfReset, useRHF } from '@/hooks';
+import { useOrderFactory } from '@/state/Order';
+import { FormField, Input, ReactSelect, Textarea } from '@/ui';
+import GetDateTime from '@/util/GetDateTime';
+import { FACTORY_NULL, FACTORY_SCHEMA } from '@util/Schema';
+import nanoid from '@/lib/nanoid';
 
 export default function Index({
-	modalId = "",
+	modalId = '',
 	setFactory,
 	updateFactory = {
-		id: null,
+		uuid: null,
 	},
 	setUpdateFactory,
 }) {
+	const { url, updateData, postData } = useOrderFactory();
 	const {
 		register,
 		handleSubmit,
@@ -28,18 +25,18 @@ export default function Index({
 		getValues,
 	} = useRHF(FACTORY_SCHEMA, FACTORY_NULL);
 
-	const { value: party } = useFetch("/party/value/label");
+	const { value: party } = useFetch('/other/party/value/label');
 
 	useFetchForRhfReset(
-		`/factory/${updateFactory?.id}`,
-		updateFactory?.id,
+		`/public/factory/${updateFactory?.uuid}`,
+		updateFactory?.uuid,
 		reset
 	);
 
 	const onClose = () => {
 		setUpdateFactory((prev) => ({
 			...prev,
-			id: null,
+			uuid: null,
 		}));
 		reset(FACTORY_NULL);
 		window[modalId].close();
@@ -47,70 +44,72 @@ export default function Index({
 
 	const onSubmit = async (data) => {
 		let party_name = party.find(
-			(item) => item.value === data.party_id
+			(item) => item.value === data.party_uuid
 		).label;
 		// Update item
-		if (updateFactory?.id !== null) {
+		if (updateFactory?.uuid !== null && updateFactory?.uuid !== undefined) {
 			const updatedData = {
 				...data,
 				party_name: party_name,
 				updated_at: GetDateTime(),
 			};
-			useUpdateFunc({
-				uri: `/factory/${updateFactory?.id}/${data?.name}`,
-				itemId: updateFactory.id,
-				data: data,
-				updatedData: updatedData,
-				setItems: setFactory,
-				onClose: onClose,
+
+			await updateData.mutateAsync({
+				url: `${url}/${updateFactory?.uuid}`,
+				uuid: updateFactory?.uuid,
+				updatedData,
+				onClose,
 			});
 
 			return;
 		}
+
+		// Add item
 		const updatedData = {
 			...data,
+			uuid: nanoid(),
 			party_name: party_name,
 			created_at: GetDateTime(),
 		};
 
-		usePostFunc({
-			uri: "/factory",
-			data: updatedData,
-			setItems: setFactory,
-			onClose: onClose,
+		await postData.mutateAsync({
+			url,
+			newData: updatedData,
+			onClose,
 		});
 	};
 
 	return (
 		<AddModal
 			id={modalId}
-			title={updateFactory?.id !== null ? "Update Factory" : "Factory"}
+			title={updateFactory?.uuid !== null ? 'Update Factory' : 'Factory'}
 			onSubmit={handleSubmit(onSubmit)}
 			onClose={onClose}
-			isSmall={true}
-		>
-			<FormField label="party_id" title="Party" errors={errors}>
+			isSmall={true}>
+			<FormField label='party_uuid' title='Party' errors={errors}>
 				<Controller
-					name={"party_id"}
+					name={'party_uuid'}
 					control={control}
 					render={({ field: { onChange } }) => {
 						return (
 							<ReactSelect
-								placeholder="Select Party"
+								placeholder='Select Party'
 								options={party}
 								value={party?.find(
 									(item) =>
-										item.value === getValues("party_id")
+										item.value === getValues('party_uuid')
 								)}
-								onChange={(e) => onChange(e.value)}
+								onChange={(e) => {
+									onChange(e.value);
+								}}
 							/>
 						);
 					}}
 				/>
 			</FormField>
-			<Input label="name" {...{ register, errors }} />
-			<Input label="phone" {...{ register, errors }} />
-			<Textarea label="address" {...{ register, errors }} />
+			<Input label='name' {...{ register, errors }} />
+			<Input label='phone' {...{ register, errors }} />
+			<Textarea label='address' {...{ register, errors }} />
 		</AddModal>
 	);
 }

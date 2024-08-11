@@ -1,9 +1,8 @@
 import { Suspense } from '@/components/Feedback';
 import ReactTable from '@/components/Table';
 import { useAccess } from '@/hooks';
-import { useOrderFactory } from '@/state/Order';
-
-import { DateTime, EditDelete } from '@/ui';
+import { useAdminDepartments } from '@/state/Admin';
+import { EditDelete } from '@/ui';
 import PageInfo from '@/util/PageInfo';
 import { lazy, useEffect, useMemo, useState } from 'react';
 
@@ -11,78 +10,45 @@ const AddOrUpdate = lazy(() => import('./AddOrUpdate'));
 const DeleteModal = lazy(() => import('@/components/Modal/Delete'));
 
 export default function Index() {
-	const { data, isLoading, url, deleteData } = useOrderFactory();
-	const info = new PageInfo('Order/Factory', url, 'order__factory');
-	const haveAccess = useAccess('order__factory');
-
-	useEffect(() => {
-		document.title = info.getTabName();
-	}, []);
+	const { data, isLoading, url, deleteData } = useAdminDepartments();
+	const info = new PageInfo('HR/Department', url, 'admin__user_department');
+	const haveAccess = useAccess(info.getTab());
 
 	const columns = useMemo(
 		() => [
 			{
-				accessorKey: 'name',
-				header: 'Name',
+				accessorKey: 'department',
+				header: 'Department',
 				enableColumnFilter: false,
 				cell: (info) => info.getValue(),
-			},
-			{
-				accessorKey: 'party_name',
-				header: 'Party Name',
-				enableColumnFilter: false,
-				cell: (info) => info.getValue(),
-			},
-			{
-				accessorKey: 'phone',
-				header: 'Phone',
-				enableColumnFilter: false,
-				cell: (info) => info.getValue(),
-			},
-			{
-				accessorKey: 'address',
-				header: 'Address',
-				enableColumnFilter: false,
-				cell: (info) => info.getValue(),
-			},
-			{
-				accessorKey: 'created_at',
-				header: 'Created At',
-				enableColumnFilter: false,
-				filterFn: 'isWithinRange',
-				cell: (info) => {
-					return <DateTime date={info.getValue()} />;
-				},
-			},
-			{
-				accessorKey: 'updated_at',
-				header: 'Updated',
-				enableColumnFilter: false,
-				cell: (info) => {
-					return <DateTime date={info.getValue()} />;
-				},
 			},
 			{
 				accessorKey: 'actions',
 				header: 'Actions',
 				enableColumnFilter: false,
 				enableSorting: false,
-				hidden: !haveAccess.includes('update'),
+				hidden:
+					!haveAccess.includes('update') &&
+					!haveAccess.includes('delete'),
 				width: 'w-24',
-				cell: (info) => {
-					return (
-						<EditDelete
-							idx={info.row.index}
-							handelUpdate={handelUpdate}
-							handelDelete={handelDelete}
-							showDelete={haveAccess.includes('delete')}
-						/>
-					);
-				},
+				cell: (info) => (
+					<EditDelete
+						idx={info.row.index}
+						handelUpdate={handelUpdate}
+						handelDelete={handelDelete}
+						showEdit={haveAccess.includes('update')}
+						showDelete={haveAccess.includes('delete')}
+					/>
+				),
 			},
 		],
 		[data]
 	);
+
+	// Fetching data from server
+	useEffect(() => {
+		document.title = info.getTabName();
+	}, []);
 
 	// Add
 	const handelAdd = () => {
@@ -90,12 +56,12 @@ export default function Index() {
 	};
 
 	// Update
-	const [updateFactory, setUpdateFactory] = useState({
+	const [updateDepartment, setUpdateDepartment] = useState({
 		uuid: null,
 	});
 
 	const handelUpdate = (idx) => {
-		setUpdateFactory((prev) => ({
+		setUpdateDepartment((prev) => ({
 			...prev,
 			uuid: data[idx].uuid,
 		}));
@@ -111,7 +77,7 @@ export default function Index() {
 		setDeleteItem((prev) => ({
 			...prev,
 			itemId: data[idx].uuid,
-			itemName: data[idx].name,
+			itemName: data[idx].department,
 		}));
 
 		window[info.getDeleteModalId()].showModal();
@@ -128,15 +94,14 @@ export default function Index() {
 				accessor={haveAccess.includes('create')}
 				data={data}
 				columns={columns}
-				extraClass='py-2'
 			/>
 
 			<Suspense>
 				<AddOrUpdate
 					modalId={info.getAddOrUpdateModalId()}
 					{...{
-						updateFactory,
-						setUpdateFactory,
+						updateDepartment,
+						setUpdateDepartment,
 					}}
 				/>
 			</Suspense>

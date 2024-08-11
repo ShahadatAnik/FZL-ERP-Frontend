@@ -42,21 +42,42 @@ export {
 };
 
 // Library
+//User
+export const LIBRARY_USER_SCHEMA = {
+	name: STRING_REQUIRED,
+	email: FORTUNE_ZIP_EMAIL_PATTERN,
+	department_designation: STRING_REQUIRED,
+	ext: STRING.nullable(),
+	phone: PHONE_NUMBER_REQUIRED,
+};
+export const LIBRARY_USER_NULL = {
+	id: null,
+	name: '',
+	email: '',
+	department_designation: null,
+	designation_uuid: null,
+	ext: '',
+	phone: '',
+};
 // Policy
 export const POLICY_SCHEMA = {
 	type: STRING_REQUIRED,
 	title: STRING_REQUIRED,
 	sub_title: STRING_REQUIRED,
-	url: STRING_REQUIRED,
+	status: NUMBER_REQUIRED,
+	url: URL_REQUIRED,
+	remarks: STRING.nullable(),
 };
 
 export const POLICY_NULL = {
-	id: null,
+	uuid: null,
 	type: '',
 	title: '',
 	sub_title: '',
+	status: 1,
 	url: '',
 	updated_at: '',
+	remarks: '',
 };
 
 // Section
@@ -66,7 +87,7 @@ export const SECTION_SCHEMA = {
 };
 
 export const SECTION_NULL = {
-	id: null,
+	uuid: null,
 	name: '',
 	short_name: '',
 	remarks: '',
@@ -85,19 +106,31 @@ export const BUYER_NULL = {
 	short_name: '',
 	remarks: '',
 };
+export const PARTY_SCHEMA = {
+	name: STRING_REQUIRED,
+	short_name: STRING.nullable(),
+	remarks: STRING.nullable(),
+};
+
+export const PARTY_NULL = {
+	uuid: null,
+	name: '',
+	short_name: '',
+	remarks: '',
+};
 
 // Merchandiser
 export const MERCHANDISER_SCHEMA = {
-	party_id: NUMBER_REQUIRED,
+	party_uuid: STRING_REQUIRED,
 	name: STRING_REQUIRED,
 	email: EMAIL.nullable(),
-	phone: STRING.nullable(),
+	phone: PHONE_NUMBER.nullable(),
 	address: STRING.nullable(),
 };
 
 export const MERCHANDISER_NULL = {
-	id: null,
-	party_id: null,
+	uuid: null,
+	party_uuid: null,
 	name: '',
 	email: '',
 	phone: '',
@@ -107,15 +140,15 @@ export const MERCHANDISER_NULL = {
 // Factory
 // party_id	name	email	phone	address	created_at	updated_at
 export const FACTORY_SCHEMA = {
-	party_id: NUMBER_REQUIRED,
+	party_uuid: STRING_REQUIRED,
 	name: STRING_REQUIRED,
 	phone: STRING.nullable(),
 	address: STRING_REQUIRED,
 };
 
 export const FACTORY_NULL = {
-	id: null,
-	party_id: null,
+	uuid: null,
+	party_uuid: null,
 	name: '',
 	phone: '',
 	address: '',
@@ -123,15 +156,15 @@ export const FACTORY_NULL = {
 
 // Marketing
 export const MARKETING_SCHEMA = {
-	user_id: NUMBER_REQUIRED,
+	user_uuid: STRING_REQUIRED,
 	name: STRING_REQUIRED,
 	short_name: STRING.nullable(),
 	remarks: STRING.nullable(),
 };
 
 export const MARKETING_NULL = {
-	id: null,
-	user_id: null,
+	uuid: null,
+	user_uuid: null,
 	name: '',
 	short_name: '',
 	remarks: '',
@@ -238,7 +271,7 @@ export const VENDOR_SCHEMA = {
 };
 
 export const VENDOR_NULL = {
-	id: null,
+	uuid: null,
 	name: '',
 	contact_number: '',
 	email: '',
@@ -328,53 +361,58 @@ export const RECEIVED_NULL = {
 // Order
 // Order Properties
 export const PROPERTIES_SCHEMA = {
+	item_for: STRING_REQUIRED,
 	type: STRING_REQUIRED,
 	name: STRING_REQUIRED,
+	short_name: STRING.nullable(),
 	remarks: STRING.nullable(),
 };
 
 export const PROPERTIES_NULL = {
-	id: null,
+	uuid: null,
+	item_for: '',
 	type: '',
 	name: '',
 	short_name: '',
 	remarks: '',
+	created_by: '',
+	created_at: '',
+	updated_at: '',
 };
 
 // Product Order
 export const handelNumberDefaultValue = (value) =>
 	value === null ? undefined : value;
+
 // Order Info
 export const ORDER_INFO_SCHEMA = {
-	reference_order: STRING.nullable(),
+	reference_order_info_uuid: STRING.nullable(),
 	is_sample: BOOLEAN_REQUIRED.default(false),
 	is_bill: BOOLEAN.default(false),
 	is_cash: BOOLEAN_REQUIRED,
 	status: BOOLEAN_REQUIRED.default(false),
-	marketing_id: NUMBER_REQUIRED,
-	merchandiser_id: NUMBER.transform(handelNumberDefaultValue).default(0), // No Merchandiser
-	factory_id: NUMBER.transform(handelNumberDefaultValue).default(0), // No Factory
-	party_id: NUMBER_REQUIRED,
-	buyer_id: NUMBER_REQUIRED,
+	marketing_uuid: STRING_REQUIRED,
+	merchandiser_uuid: STRING.transform(handelNumberDefaultValue).default(0), // No Merchandiser
+	factory_uuid: STRING.transform(handelNumberDefaultValue).default(0), // No Factory
+	party_uuid: STRING_REQUIRED,
+	buyer_uuid: STRING_REQUIRED,
 	marketing_priority: STRING,
 	factory_priority: STRING,
 	remarks: STRING.nullable(),
 };
 
 export const ORDER_INFO_NULL = {
-	id: null,
-	reference_order: '',
-	is_zipper: false,
-	order_info_id: '',
+	uuid: null,
+	reference_order_info_uuid: '',
 	is_sample: false,
 	is_bill: false,
 	is_cash: false,
-	order_status: false,
-	marketing_id: null,
-	merchandiser_id: null,
-	factory_id: null,
-	party_id: null,
-	buyer_id: null,
+	status: false,
+	marketing_uuid: null,
+	merchandiser_uuid: null,
+	factory_uuid: null,
+	party_uuid: null,
+	buyer_uuid: null,
 	marketing_priority: '',
 	factory_priority: '',
 	remarks: '',
@@ -595,7 +633,7 @@ export const USER_SCHEMA = {
 };
 
 export const USER_NULL = {
-	id: null,
+	uuid: null,
 	name: '',
 	email: '',
 	department_designation: null,
@@ -606,13 +644,25 @@ export const USER_NULL = {
 	remarks: '',
 };
 
+// * User -> Department
 export const USER_DEPARTMENT_SCHEMA = {
 	department: STRING_REQUIRED,
-	designation: STRING_REQUIRED,
 };
 
 export const USER_DEPARTMENT_NULL = {
-	id: null,
+	uuid: null,
+	department: '',
+};
+
+// * User -> Designation
+export const USER_DESIGNATION_SCHEMA = {
+	department_uuid: UUID_PK,
+	designation: STRING_REQUIRED,
+};
+
+export const USER_DESIGNATION_NULL = {
+	uuid: null,
+	department_uuid: null,
 	department: '',
 	designation: '',
 };
@@ -998,7 +1048,7 @@ export const BANK_SCHEMA = {
 };
 
 export const BANK_NULL = {
-	id: null,
+	uuid: null,
 	name: '',
 	swift_code: '',
 	address: '',

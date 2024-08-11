@@ -1,7 +1,7 @@
 import { Suspense } from '@/components/Feedback';
 import ReactTable from '@/components/Table';
-import { useAccess, useFetchFunc, useUpdateFunc } from '@/hooks';
-import { useAdminUsers } from '@/state/Admin/user';
+import { useAccess, useUpdateFunc } from '@/hooks';
+import { useAdminUsers } from '@/state/Admin';
 import { DateTime, EditDelete, ResetPassword, StatusButton } from '@/ui';
 import GetDateTime from '@/util/GetDateTime';
 import PageInfo from '@/util/PageInfo';
@@ -13,25 +13,43 @@ const ResetPass = lazy(() => import('./ResetPass'));
 const PageAssign = lazy(() => import('./PageAssign'));
 
 export default function Order() {
-	const info = new PageInfo('User', 'hr/user', 'admin__user');
-	const { data, isLoading, isError, updateData } = useAdminUsers();
-	const [users, setUsers] = useState([]);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState(null);
-	const haveAccess = useAccess('admin__user');
+	const { data, url, isLoading, deleteData } = useAdminUsers();
+	const info = new PageInfo('Admin/User', url, 'admin__user');
+	const haveAccess = useAccess(info.getTab());
 
 	const columns = useMemo(
 		() => [
 			{
+				accessorKey: 'page_assign_actions',
+				header: (
+					<span>
+						Page
+						<br />
+						Assign
+					</span>
+				),
+				enableColumnFilter: false,
+				enableSorting: false,
+				width: 'w-24',
+				hidden: !haveAccess.includes('click_page_assign'),
+				cell: (info) => {
+					return (
+						<ResetPassword
+							onClick={() => handelPageAssign(info.row.index)}
+						/>
+					);
+				},
+			},
+			{
 				accessorKey: 'status',
 				header: 'Status',
 				enableColumnFilter: false,
-				width: 'w-24',
+				width: 'w-8',
 				hidden: !haveAccess.includes('click_status'),
 				cell: (info) => {
 					return (
 						<StatusButton
-							size='btn-sm'
+							size='btn-xs'
 							value={info.getValue()}
 							onClick={() => handelStatus(info.row.index)}
 						/>
@@ -42,7 +60,9 @@ export default function Order() {
 				accessorKey: 'name',
 				header: 'Name',
 				enableColumnFilter: false,
-				cell: (info) => info.getValue(),
+				cell: (info) => (
+					<span className='capitalize'>{info.getValue()}</span>
+				),
 			},
 			{
 				accessorKey: 'email',
@@ -51,10 +71,21 @@ export default function Order() {
 				cell: (info) => info.getValue(),
 			},
 			{
-				accessorKey: 'user_department',
+				accessorKey: 'department',
 				header: 'Department',
 				enableColumnFilter: false,
-				cell: (info) => info.getValue(),
+				cell: (info) => {
+					const { department, designation } = info.row.original;
+
+					return (
+						<div className='flex flex-col'>
+							<span className='capitalize'>{department}</span>
+							<span className='text-xs capitalize text-gray-400'>
+								{designation}
+							</span>
+						</div>
+					);
+				},
 			},
 			{
 				accessorKey: 'remarks',
@@ -82,27 +113,7 @@ export default function Order() {
 					/>
 				),
 			},
-			{
-				accessorKey: 'page_assign_actions',
-				header: (
-					<span>
-						Page
-						<br />
-						Assign
-					</span>
-				),
-				enableColumnFilter: false,
-				enableSorting: false,
-				width: 'w-24',
-				hidden: !haveAccess.includes('click_page_assign'),
-				cell: (info) => {
-					return (
-						<ResetPassword
-							onClick={() => handelPageAssign(info.row.index)}
-						/>
-					);
-				},
-			},
+
 			{
 				accessorKey: 'created_at',
 				header: 'Created',
@@ -150,8 +161,6 @@ export default function Order() {
 	}, []);
 
 	const handelAdd = () => {
-		console.log(window[info?.getAddOrUpdateModalId()]);
-
 		window[info?.getAddOrUpdateModalId()]?.showModal();
 	};
 
@@ -219,14 +228,14 @@ export default function Order() {
 	const [pageAssign, setPageAssign] = useState({
 		uuid: null,
 		name: null,
-		can_access: null,
 	});
 	const handelPageAssign = async (idx) => {
+		console.log(data[idx]);
+		
 		setPageAssign((prev) => ({
 			...prev,
 			uuid: data[idx]?.uuid,
 			name: data[idx]?.name,
-			can_access: JSON?.parse(data[idx]?.can_access),
 		}));
 
 		window['page_assign_modal'].showModal();
@@ -251,7 +260,6 @@ export default function Order() {
 				<AddOrUpdate
 					modalId={info.getAddOrUpdateModalId()}
 					{...{
-						setUsers,
 						updateUser,
 						setUpdateUser,
 					}}
@@ -261,10 +269,12 @@ export default function Order() {
 				<DeleteModal
 					modalId={info.getDeleteModalId()}
 					title={info.getTitle()}
-					deleteItem={deleteItem}
-					setDeleteItem={setDeleteItem}
-					setItems={setUsers}
-					uri={info.getDeleteUrl()}
+					{...{
+						deleteItem,
+						setDeleteItem,
+						url,
+						deleteData,
+					}}
 				/>
 			</Suspense>
 			<Suspense>
@@ -273,7 +283,6 @@ export default function Order() {
 					{...{
 						resPass,
 						setResPass,
-						setUsers,
 					}}
 				/>
 			</Suspense>
@@ -283,7 +292,6 @@ export default function Order() {
 					{...{
 						pageAssign,
 						setPageAssign,
-						setUsers,
 					}}
 				/>
 			</Suspense>

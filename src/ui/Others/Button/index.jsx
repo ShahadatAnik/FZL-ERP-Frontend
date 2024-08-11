@@ -7,7 +7,7 @@ const ResetPassword = ({ onClick }) => {
 	return (
 		<button
 			type="button"
-			className="btn btn-circle btn-accent btn-sm font-semibold"
+			className="btn btn-circle btn-accent btn-xs font-semibold"
 			onClick={onClick}
 		>
 			<ArrowBack className="w-4" />

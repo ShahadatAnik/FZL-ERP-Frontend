@@ -1,33 +1,35 @@
-import { AddModal } from "@/components/Modal";
-import {
-	useFetchForRhfReset,
-	usePostFunc,
-	useRHF,
-	useUpdateFunc,
-} from "@/hooks";
-import { Input } from "@/ui";
-import GetDateTime from "@/util/GetDateTime";
-import { VENDOR_NULL, VENDOR_SCHEMA } from "@util/Schema";
+import { AddModal } from '@/components/Modal';
+import { useFetchForRhfReset, useRHF } from '@/hooks';
+import nanoid from '@/lib/nanoid';
+import { usePurchaseVendor } from '@/state/Purchase';
+import { Input } from '@/ui';
+import GetDateTime from '@/util/GetDateTime';
+import { VENDOR_NULL, VENDOR_SCHEMA } from '@util/Schema';
 
 export default function Index({
-	modalId = "",
+	modalId = '',
 	setVendor,
 	updateVendor = {
-		id: null,
+		uuid: null,
 	},
 	setUpdateVendor,
 }) {
+	const { url, updateData, postData } = usePurchaseVendor();
 	const { register, handleSubmit, errors, reset } = useRHF(
 		VENDOR_SCHEMA,
 		VENDOR_NULL
 	);
 
-	useFetchForRhfReset(`/vendor/${updateVendor?.id}`, updateVendor?.id, reset);
+	useFetchForRhfReset(
+		`/purchase/vendor/${updateVendor?.uuid}`,
+		updateVendor?.uuid,
+		reset
+	);
 
 	const onClose = () => {
 		setUpdateVendor((prev) => ({
 			...prev,
-			id: null,
+			uuid: null,
 		}));
 		reset(VENDOR_NULL);
 		window[modalId].close();
@@ -35,18 +37,17 @@ export default function Index({
 
 	const onSubmit = async (data) => {
 		// Update item
-		if (updateVendor?.id !== null) {
+		if (updateVendor?.uuid !== null) {
 			const updatedData = {
 				...data,
 				updated_at: GetDateTime(),
 			};
-			useUpdateFunc({
-				uri: `/vendor/${updateVendor?.id}/${data?.name}`,
-				itemId: updateVendor.id,
-				data: data,
-				updatedData: updatedData,
-				setItems: setVendor,
-				onClose: onClose,
+
+			await updateData.mutateAsync({
+				url: `${url}/${updateVendor?.uuid}`,
+				uuid: updateVendor?.uuid,
+				updatedData,
+				onClose,
 			});
 
 			return;
@@ -54,38 +55,37 @@ export default function Index({
 		const updatedData = {
 			...data,
 			created_at: GetDateTime(),
+			uuid: nanoid(),
 		};
 
-		usePostFunc({
-			uri: "/vendor",
-			data: updatedData,
-			setItems: setVendor,
-			onClose: onClose,
+		await postData.mutateAsync({
+			url,
+			newData: updatedData,
+			onClose,
 		});
 	};
 
 	return (
 		<AddModal
 			id={modalId}
-			title={updateVendor?.id !== null ? "Update Vendor" : "Vendor"}
+			title={updateVendor?.uuid !== null ? 'Update Vendor' : 'Vendor'}
 			onSubmit={handleSubmit(onSubmit)}
 			onClose={onClose}
-			isSmall={true}
-		>
-			<Input label="name" {...{ register, errors }} />
+			isSmall={true}>
+			<Input label='name' {...{ register, errors }} />
 			<Input
-				label="contact_name"
-				title="Person"
+				label='contact_name'
+				title='Person'
 				{...{ register, errors }}
 			/>
 			<Input
-				label="contact_number"
-				title="Phone Number"
+				label='contact_number'
+				title='Phone Number'
 				{...{ register, errors }}
 			/>
-			<Input label="email" {...{ register, errors }} />
-			<Input label="office_address" {...{ register, errors }} />
-			<Input label="remarks" {...{ register, errors }} />
+			<Input label='email' {...{ register, errors }} />
+			<Input label='office_address' {...{ register, errors }} />
+			<Input label='remarks' {...{ register, errors }} />
 		</AddModal>
 	);
 }

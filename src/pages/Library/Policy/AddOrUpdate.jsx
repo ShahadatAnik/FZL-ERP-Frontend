@@ -1,37 +1,33 @@
-import { AddModal } from "@/components/Modal";
-import {
-	useFetchForRhfReset,
-	usePostFunc,
-	useRHF,
-	useUpdateFunc,
-} from "@/hooks";
-import { Input, Select, Textarea } from "@/ui";
-import GetDateTime from "@/util/GetDateTime";
-import { POLICY_NULL, POLICY_SCHEMA } from "@util/Schema";
+import { AddModal } from '@/components/Modal';
+import { useFetchForRhfReset, useRHF } from '@/hooks';
+import nanoid from '@/lib/nanoid';
+import { useLibraryPolicy } from '@/state/Library';
+import { Input, Select, Textarea } from '@/ui';
+import GetDateTime from '@/util/GetDateTime';
+import { DevTool } from '@hookform/devtools';
+import { POLICY_NULL, POLICY_SCHEMA } from '@util/Schema';
 
 export default function Index({
-	modalId = "",
-	setPolicy,
+	modalId = '',
 	updatePolicy = {
-		id: null,
+		uuid: null,
 	},
 	setUpdatePolicy,
 }) {
-	const { register, handleSubmit, errors, reset } = useRHF(
-		POLICY_SCHEMA,
-		POLICY_NULL
-	);
+	const { url, updateData, postData } = useLibraryPolicy();
+	const { register, handleSubmit, errors, reset, control, getValues } =
+		useRHF(POLICY_SCHEMA, POLICY_NULL);
 
 	useFetchForRhfReset(
-		`/policy-and-notice/${updatePolicy?.id}`,
-		updatePolicy?.id,
+		`${url}/${updatePolicy?.uuid}`,
+		updatePolicy?.uuid,
 		reset
 	);
 
 	const onClose = () => {
 		setUpdatePolicy((prev) => ({
 			...prev,
-			id: null,
+			uuid: null,
 		}));
 		reset(POLICY_NULL);
 		window[modalId].close();
@@ -39,54 +35,65 @@ export default function Index({
 
 	const onSubmit = async (data) => {
 		// Update item
-		if (updatePolicy?.id !== null) {
+		if (updatePolicy?.uuid !== null && updatePolicy?.uuid !== undefined) {
 			const updatedData = {
 				...data,
 				updated_at: GetDateTime(),
 			};
-			await useUpdateFunc({
-				uri: `/policy-and-notice/${updatePolicy?.id}/${data?.title}`,
-				itemId: updatePolicy.id,
-				data: data,
-				updatedData: updatedData,
-				setItems: setPolicy,
-				onClose: onClose,
+			console.log(`${url}/${updatePolicy?.uuid}`);
+
+			await updateData.mutateAsync({
+				url: `${url}/${updatePolicy?.uuid}`,
+				uuid: updatePolicy?.uuid,
+				updatedData,
+				onClose,
 			});
 
 			return;
 		}
 		const updatedData = {
 			...data,
+			uuid: nanoid(),
 			created_at: GetDateTime(),
 		};
 
-		await usePostFunc({
-			uri: "/policy-and-notice",
-			data: updatedData,
-			setItems: setPolicy,
-			onClose: onClose,
+		console.log(url);
+
+		await postData.mutateAsync({
+			url,
+			newData: updatedData,
+			onClose,
 		});
 	};
 
 	return (
 		<AddModal
 			id={modalId}
-			title={updatePolicy?.id !== null ? "Update Policy" : "Policy"}
+			title={updatePolicy?.uuid !== null ? 'Update Policy' : 'Policy'}
 			onSubmit={handleSubmit(onSubmit)}
 			onClose={onClose}
-			isSmall={true}
-		>
+			isSmall={true}>
 			<Select
-				label="type"
+				label='type'
 				option={[
-					{ value: "policy", label: "Policy" },
-					{ value: "notice", label: "Notice" },
+					{ value: 'policy', label: 'Policy' },
+					{ value: 'notice', label: 'Notice' },
 				]}
 				{...{ register, errors }}
 			/>
-			<Textarea label="title" {...{ register, errors }} />
-			<Textarea label="sub_title" {...{ register, errors }} />
-			<Textarea label="url" {...{ register, errors }} />
+			<Textarea label='title' {...{ register, errors }} />
+			<Textarea label='sub_title' {...{ register, errors }} />
+			<Textarea label='url' {...{ register, errors }} />
+			<Select
+				label='status'
+				option={[
+					{ value: 1, label: 'Active' },
+					{ value: 0, label: 'Inactive' },
+				]}
+				{...{ register, errors }}
+			/>
+			<Textarea label='remarks' {...{ register, errors }} />
+			<DevTool control={control} placement='top-left' />
 		</AddModal>
 	);
 }

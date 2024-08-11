@@ -1,7 +1,8 @@
 import { AddModal } from '@/components/Modal';
 import { DebouncedInput } from '@/components/Table/components';
-import { useFetchForRhfResetForUserAccess, useRHF, useUpdateFunc } from '@/hooks';
+import { useFetchForRhfResetForUserAccess, useRHF } from '@/hooks';
 import { PRIVATE_ROUTES } from '@/routes';
+import { useAdminUsers } from '@/state/Admin';
 import { CheckBox } from '@/ui';
 import GetDateTime from '@/util/GetDateTime';
 import { BOOLEAN } from '@/util/Schema';
@@ -10,28 +11,33 @@ import { Link } from 'react-router-dom';
 
 export default function Index({
 	modalId = '',
-	pageAssign = { uuid: null, name: null, can_access: null },
+	pageAssign = { uuid: null, name: null },
 	setPageAssign,
-	setUsers,
 }) {
-	const ALL_PAGE_ACTIONS = PRIVATE_ROUTES.filter((item) => item.actions !== undefined);
+	const { url, updateData } = useAdminUsers();
+	const ALL_PAGE_ACTIONS = PRIVATE_ROUTES.filter(
+		(item) => item.actions !== undefined
+	);
 
 	const [searchPageName, setSearchPageName] = useState('');
 	const filteredPageActions = ALL_PAGE_ACTIONS.filter(({ page_name }) =>
 		page_name.toLowerCase().includes(searchPageName.toLowerCase())
 	);
 
-	const PAGE_ACTIONS = ALL_PAGE_ACTIONS.reduce((acc, { page_name, actions }) => {
-		actions.forEach((action) => {
-			const key = page_name + '___' + action;
-			acc[key] = {
-				schema: BOOLEAN,
-				default: false,
-				null: null,
-			};
-		});
-		return acc;
-	}, {});
+	const PAGE_ACTIONS = ALL_PAGE_ACTIONS.reduce(
+		(acc, { page_name, actions }) => {
+			actions.forEach((action) => {
+				const key = page_name + '___' + action;
+				acc[key] = {
+					schema: BOOLEAN,
+					default: false,
+					null: null,
+				};
+			});
+			return acc;
+		},
+		{}
+	);
 
 	const PAGE_ACTIONS_SCHEMA = {};
 	const PAGE_ACTIONS_DEFAULT = {};
@@ -43,10 +49,11 @@ export default function Index({
 		PAGE_ACTIONS_NULL[key] = value.null;
 	});
 
-	const { register, handleSubmit, errors, reset, getValues } = useRHF(PAGE_ACTIONS_SCHEMA, {});
+	const { register, handleSubmit, errors, reset, getValues } =
+		useRHF(PAGE_ACTIONS_SCHEMA);
 
 	useFetchForRhfResetForUserAccess(
-		`/hr/user/can-access/${pageAssign?.uuid}`,
+		`${url}/can-access/${pageAssign?.uuid}`,
 		pageAssign?.uuid,
 		reset
 	);
@@ -56,9 +63,8 @@ export default function Index({
 			...prev,
 			uuid: null,
 			name: null,
-			can_access: null,
 		}));
-		reset({});
+		reset(PAGE_ACTIONS_NULL);
 		window[modalId].close();
 	};
 
@@ -81,20 +87,24 @@ export default function Index({
 			updated_at: GetDateTime(),
 		};
 
-		await useUpdateFunc({
-			uri: `/hr/user/can-access/${pageAssign?.uuid}/${pageAssign?.name}`,
-			itemId: pageAssign.uuid,
-			data: data,
-			updatedData: updatedData,
-			// setItems: setUsers,
-			onClose: onClose,
+		await updateData.mutateAsync({
+			url: `${url}/can-access/${pageAssign?.uuid}`,
+			uuid: pageAssign.uuid,
+			updatedData,
+			onClose,
 		});
+
+		return;
 	};
 
 	return (
 		<AddModal
 			id={modalId}
-			title={pageAssign?.uuid !== null ? 'Page Assign: ' + pageAssign?.name : 'Page Assign'}
+			title={
+				pageAssign?.uuid !== null
+					? 'Page Assign: ' + pageAssign?.name
+					: 'Page Assign'
+			}
 			onSubmit={handleSubmit(onSubmit)}
 			onClose={onClose}>
 			<DebouncedInput
@@ -119,7 +129,9 @@ export default function Index({
 									to={path}
 									className='link-hover link link-primary font-semibold capitalize peer-hover:underline'
 									target='_blank'>
-									{page_name.replace(/__/, ': ').replace(/_/g, ' ')}
+									{page_name
+										.replace(/__/, ': ')
+										.replace(/_/g, ' ')}
 								</Link>
 								<div className='flex flex-wrap gap-1'>
 									{actions.map((action) => (
@@ -128,8 +140,13 @@ export default function Index({
 											className='rounded-md border border-primary px-1'>
 											<CheckBox
 												key={page_name + '___' + action}
-												label={page_name + '___' + action}
-												title={action.replace(/_/g, ' ')}
+												label={
+													page_name + '___' + action
+												}
+												title={action.replace(
+													/_/g,
+													' '
+												)}
 												type='peer checkbox-primary'
 												text='rounded-full text-sm text-primary transition-colors duration-300 ease-in-out'
 												defaultChecked={getValues?.(

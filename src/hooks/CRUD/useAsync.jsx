@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from 'react';
 
 export default function useAsync(callback, dependencies = []) {
 	const [loading, setLoading] = useState(true);
@@ -10,7 +10,7 @@ export default function useAsync(callback, dependencies = []) {
 		setError(undefined);
 		setValue(undefined);
 		callback()
-			.then(setValue)
+			.then((res)=>setValue(res?.data))
 			.catch(setError)
 			.finally(() => setLoading(false));
 	}, dependencies);

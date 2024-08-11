@@ -1,23 +1,26 @@
-import { AddModal } from "@/components/Modal";
+import { AddModal } from '@/components/Modal';
 import {
 	useFetch,
 	useFetchForRhfReset,
 	usePostFunc,
 	useRHF,
 	useUpdateFunc,
-} from "@/hooks";
-import { FormField, Input, ReactSelect, Textarea } from "@/ui";
-import GetDateTime from "@/util/GetDateTime";
-import { MERCHANDISER_NULL, MERCHANDISER_SCHEMA } from "@util/Schema";
+} from '@/hooks';
+import nanoid from '@/lib/nanoid';
+import { useOrderMerchandiser } from '@/state/Order';
+import { FormField, Input, ReactSelect, Textarea } from '@/ui';
+import GetDateTime from '@/util/GetDateTime';
+import { MERCHANDISER_NULL, MERCHANDISER_SCHEMA } from '@util/Schema';
 
 export default function Index({
-	modalId = "",
-	setMerchandiser,
+	modalId = '',
 	updateMerchandiser = {
-		id: null,
+		uuid: null,
+		party_uuid: null,
 	},
 	setUpdateMerchandiser,
 }) {
+	const { url, updateData, postData } = useOrderMerchandiser();
 	const {
 		register,
 		handleSubmit,
@@ -28,18 +31,18 @@ export default function Index({
 		getValues,
 	} = useRHF(MERCHANDISER_SCHEMA, MERCHANDISER_NULL);
 
-	const { value: party } = useFetch("/party/value/label");
+	const { value: party } = useFetch('/other/party/value/label');
 
 	useFetchForRhfReset(
-		`/merchandiser/${updateMerchandiser?.id}`,
-		updateMerchandiser?.id,
+		`${url}/${updateMerchandiser?.uuid}`,
+		updateMerchandiser?.uuid,
 		reset
 	);
 
 	const onClose = () => {
 		setUpdateMerchandiser((prev) => ({
 			...prev,
-			id: null,
+			uuid: null,
 		}));
 		reset(MERCHANDISER_NULL);
 		window[modalId].close();
@@ -47,37 +50,40 @@ export default function Index({
 
 	const onSubmit = async (data) => {
 		let party_name = party.find(
-			(item) => item.value === data.party_id
+			(item) => item.value === data.party_uuid
 		).label;
+
 		// Update item
-		if (updateMerchandiser?.id !== null) {
+		if (
+			updateMerchandiser?.uuid !== null &&
+			updateMerchandiser?.uuid !== undefined
+		) {
 			const updatedData = {
 				...data,
 				party_name: party_name,
 				updated_at: GetDateTime(),
 			};
-			useUpdateFunc({
-				uri: `/merchandiser/${updateMerchandiser?.id}/${data?.name}`,
-				itemId: updateMerchandiser.id,
-				data: data,
-				updatedData: updatedData,
-				setItems: setMerchandiser,
-				onClose: onClose,
+			await updateData.mutateAsync({
+				url: `${url}/${updateMerchandiser?.uuid}`,
+				uuid: updateMerchandiser?.uuid,
+				updatedData,
+				onClose,
 			});
 
 			return;
 		}
 		const updatedData = {
 			...data,
+			uuid: nanoid(),
 			party_name: party_name,
 			created_at: GetDateTime(),
 		};
 
-		usePostFunc({
-			uri: "/merchandiser",
-			data: updatedData,
-			setItems: setMerchandiser,
-			onClose: onClose,
+		console.log(updatedData);
+		await postData.mutateAsync({
+			url,
+			newData: updatedData,
+			onClose,
 		});
 	};
 
@@ -85,26 +91,25 @@ export default function Index({
 		<AddModal
 			id={modalId}
 			title={
-				updateMerchandiser?.id !== null
-					? "Update Merchandiser"
-					: "Merchandiser"
+				updateMerchandiser?.uuid !== null
+					? 'Update Merchandiser'
+					: 'Merchandiser'
 			}
 			onSubmit={handleSubmit(onSubmit)}
 			onClose={onClose}
-			isSmall={true}
-		>
-			<FormField label="party_id" title="Party" errors={errors}>
+			isSmall={true}>
+			<FormField label='party_uuid' title='Party' errors={errors}>
 				<Controller
-					name={"party_id"}
+					name={'party_uuid'}
 					control={control}
 					render={({ field: { onChange } }) => {
 						return (
 							<ReactSelect
-								placeholder="Select Party"
+								placeholder='Select Party'
 								options={party}
 								value={party?.find(
 									(item) =>
-										item.value === getValues("party_id")
+										item.value === getValues('party_uuid')
 								)}
 								onChange={(e) => onChange(e.value)}
 							/>
@@ -112,10 +117,10 @@ export default function Index({
 					}}
 				/>
 			</FormField>
-			<Input label="name" {...{ register, errors }} />
-			<Input label="email" {...{ register, errors }} />
-			<Input label="phone" {...{ register, errors }} />
-			<Textarea label="address" {...{ register, errors }} />
+			<Input label='name' {...{ register, errors }} />
+			<Input label='email' {...{ register, errors }} />
+			<Input label='phone' {...{ register, errors }} />
+			<Textarea label='address' {...{ register, errors }} />
 		</AddModal>
 	);
 }

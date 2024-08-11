@@ -1,11 +1,6 @@
 import { AddModal } from '@/components/Modal';
-import {
-	useFetch,
-	useFetchForRhfReset,
-	usePostFunc,
-	useRHF,
-	useUpdateFunc,
-} from '@/hooks';
+import { useFetch, useFetchForRhfReset, useRHF } from '@/hooks';
+import { useAdminUsers } from '@/state/Admin';
 import { FormField, Input, PasswordInput, ReactSelect, Textarea } from '@/ui';
 import GetDateTime from '@/util/GetDateTime';
 import { PASSWORD, USER_NULL, USER_SCHEMA } from '@util/Schema';
@@ -13,10 +8,10 @@ import * as yup from 'yup';
 
 export default function Index({
 	modalId = '',
-	setUsers,
 	updateUser = { uuid: null, department_designation: null },
 	setUpdateUser,
 }) {
+	const { url, updateData, postData } = useAdminUsers();
 	var schema = USER_SCHEMA;
 
 	if (updateUser?.uuid == null) {
@@ -39,7 +34,11 @@ export default function Index({
 		getValues,
 	} = useRHF(schema, USER_NULL);
 
-	useFetchForRhfReset(`hr/user/${updateUser?.uuid}`, updateUser?.uuid, reset);
+	useFetchForRhfReset(
+		`/hr/user/${updateUser?.uuid}`,
+		updateUser?.uuid,
+		reset
+	);
 
 	const onClose = () => {
 		setUpdateUser((prev) => ({
@@ -52,36 +51,34 @@ export default function Index({
 	};
 
 	const onSubmit = async (data) => {
-		// Update item
+		// * Update item
 		if (updateUser?.uuid !== null) {
 			const updatedData = {
 				...data,
 				updated_at: GetDateTime(),
 			};
-			await useUpdateFunc({
-				uri: `/hr/user/${updateUser?.uuid}/${data?.name}`,
-				itemId: updateUser.uuid,
-				data: data,
-				updatedData: updatedData,
-				setItems: setUsers,
-				onClose: onClose,
+
+			await updateData.mutateAsync({
+				url: `${url}/${updateUser?.uuid}`,
+				uuid: updateUser?.uuid,
+				updatedData,
+				onClose,
 			});
 
 			return;
 		}
 
-		// New item
+		// * New item
 		const updatedData = {
 			...data,
 			status: 1,
 			created_at: GetDateTime(),
 		};
 
-		await usePostFunc({
-			uri: '/hr/user',
-			data: updatedData,
-			setItems: setUsers,
-			onClose: onClose,
+		await postData.mutateAsync({
+			url,
+			newData: updatedData,
+			onClose,
 		});
 	};
 

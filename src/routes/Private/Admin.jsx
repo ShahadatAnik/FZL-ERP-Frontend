@@ -1,53 +1,61 @@
-import { lazy } from "react";
+import { lazy } from 'react';
 
 // Pages
 // Admin
-const User = lazy(() => import("@pages/Admin/User"));
-const UserDepartment = lazy(
-	() => import("@pages/Admin/UserDepartmentDesignation")
-);
-const NotFound = lazy(() => import("@pages/Public/NoEntry/notFound"));
-const NoAccess = lazy(() => import("@pages/Public/NoEntry/noAccess"));
+const User = lazy(() => import('@pages/Admin/User'));
+const Department = lazy(() => import('@pages/Admin/Department'));
+const Designation = lazy(() => import('@pages/Admin/Designation'));
+const NotFound = lazy(() => import('@pages/Public/NoEntry/notFound'));
+const NoAccess = lazy(() => import('@pages/Public/NoEntry/noAccess'));
 
 export const AdminRoutes = [
 	{
 		id: 1,
-		name: "User",
-		path: "/admin/user",
+		name: 'User',
+		path: '/hr/user',
 		element: User,
-		type: "admin",
-		page_name: "admin__user",
+		type: 'hr',
+		page_name: 'admin__user',
 		actions: [
-			"create",
-			"read",
-			"update",
-			"delete",
-			"click_status",
-			"click_reset_password",
-			"click_page_assign",
+			'create',
+			'read',
+			'update',
+			'delete',
+			'click_status',
+			'click_reset_password',
+			'click_page_assign',
 		],
 	},
 	{
 		id: 11,
-		name: "Department",
-		path: "/admin-user/department",
-		element: UserDepartment,
-		type: "admin",
-		page_name: "admin__user_department",
-		actions: ["create", "read", "update", "delete"],
+		name: 'Department',
+		path: '/hr/department',
+		element: Department,
+		type: 'hr',
+		page_name: 'admin__user_department',
+		actions: ['create', 'read', 'update', 'delete'],
+	},
+	{
+		id: 11,
+		name: 'Department',
+		path: '/hr/designation',
+		element: Designation,
+		type: 'hr',
+		page_name: 'admin__user_designation',
+		actions: ['create', 'read', 'update', 'delete'],
 	},
 	{
 		id: 2,
-		name: "Not Found",
-		path: "*",
+		name: 'Not Found',
+		path: '*',
 		element: NotFound,
-		page_name: "admin__public",
+		page_name: 'admin__public',
 	},
 	{
 		id: 3,
-		name: "No Access",
-		path: "/no-access",
+		name: 'No Access',
+		path: '/no-access',
 		element: NoAccess,
-		page_name: "admin__public",
+		page_name: 'admin__public',
 	},
 ];

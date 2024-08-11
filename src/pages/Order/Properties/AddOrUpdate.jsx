@@ -1,42 +1,41 @@
-import { AddModal } from "@/components/Modal";
-import {
-	useFetchForRhfReset,
-	usePostFunc,
-	useRHF,
-	useUpdateFunc,
-} from "@/hooks";
-import { FormField, Input, ReactSelect } from "@/ui";
-import GetDateTime from "@/util/GetDateTime";
-import { PROPERTIES_NULL, PROPERTIES_SCHEMA } from "@util/Schema";
+import { AddModal } from '@/components/Modal';
+import { useAuth } from '@/context/auth';
+import { useFetchForRhfReset, useRHF } from '@/hooks';
+import nanoid from '@/lib/nanoid';
+import { useOrderProperties } from '@/state/Order';
+import { FormField, Input, ReactSelect } from '@/ui';
+import GetDateTime from '@/util/GetDateTime';
+import { PROPERTIES_NULL, PROPERTIES_SCHEMA } from '@util/Schema';
 
 export default function Index({
-	modalId = "",
-	setOrderProperties,
+	modalId = '',
 	updateOrderProperties = {
-		id: null,
+		uuid: null,
 	},
 	setUpdateOrderProperties,
 }) {
+	const { user } = useAuth();
+	const { url, updateData, postData } = useOrderProperties();
 	const {
 		register,
 		handleSubmit,
 		errors,
 		reset,
-		Controller,
 		control,
+		Controller,
 		getValues,
 	} = useRHF(PROPERTIES_SCHEMA, PROPERTIES_NULL);
 
 	useFetchForRhfReset(
-		`/order/properties/${updateOrderProperties?.id}`,
-		updateOrderProperties?.id,
+		`${url}/${updateOrderProperties?.uuid}`,
+		updateOrderProperties?.uuid,
 		reset
 	);
 
 	const onClose = () => {
 		setUpdateOrderProperties((prev) => ({
 			...prev,
-			id: null,
+			uuid: null,
 		}));
 		reset(PROPERTIES_NULL);
 		window[modalId].close();
@@ -44,88 +43,123 @@ export default function Index({
 
 	const onSubmit = async (data) => {
 		// Update item
-		if (updateOrderProperties?.id !== null) {
+		if (
+			updateOrderProperties?.uuid !== null &&
+			updateOrderProperties?.uuid !== undefined
+		) {
 			const updatedData = {
 				...data,
 				updated_at: GetDateTime(),
 			};
-			useUpdateFunc({
-				uri: `/order/properties/${updateOrderProperties?.id}/${data?.name}`,
-				itemId: updateOrderProperties.id,
-				data: data,
-				updatedData: updatedData,
-				setItems: setOrderProperties,
-				onClose: onClose,
+			await updateData.mutateAsync({
+				url: `${url}/${updateOrderProperties?.uuid}`,
+				uuid: updateOrderProperties?.uuid,
+				updatedData,
+				onClose,
 			});
 
 			return;
 		}
 		const updatedData = {
 			...data,
+			uuid: nanoid(),
+			created_by: user?.uuid,
 			created_at: GetDateTime(),
+			updated_at: null,
 		};
 
-		usePostFunc({
-			uri: "/order/properties",
-			data: updatedData,
-			setItems: setOrderProperties,
-			onClose: onClose,
+		await postData.mutateAsync({
+			url,
+			newData: updatedData,
+			onClose,
 		});
 	};
 
 	const typeOptions = [
-		{ value: "end_type", label: "End Type" },
-		{ value: "lock_type", label: "Lock Type" },
-		{ value: "item", label: "Item" },
-		{ value: "zipper_number", label: "Zipper Number" },
-		{ value: "puller_type", label: "Puller Type" },
-		{ value: "hand", label: "Hand" },
-		{ value: "special_requirement", label: "Special Requirement" },
-		{ value: "color", label: "Color" },
-		{ value: "stopper_type", label: "Stopper Type" },
-		{ value: "coloring_type", label: "Coloring Type" },
-		{ value: "slider", label: "Slider" },
-		{ value: "top_stopper", label: "Top Stopper" },
-		{ value: "bottom_stopper", label: "Bottom Stopper" },
-		{ value: "logo_type", label: "Logo Type" },
+		{ value: 'end_type', label: 'End Type' },
+		{ value: 'lock_type', label: 'Lock Type' },
+		{ value: 'item', label: 'Item' },
+		{ value: 'zipper_number', label: 'Zipper Number' },
+		{ value: 'puller_type', label: 'Puller Type' },
+		{ value: 'hand', label: 'Hand' },
+		{ value: 'special_requirement', label: 'Special Requirement' },
+		{ value: 'color', label: 'Color' },
+		{ value: 'stopper_type', label: 'Stopper Type' },
+		{ value: 'coloring_type', label: 'Coloring Type' },
+		{ value: 'slider', label: 'Slider' },
+		{ value: 'top_stopper', label: 'Top Stopper' },
+		{ value: 'bottom_stopper', label: 'Bottom Stopper' },
+		{ value: 'logo_type', label: 'Logo Type' },
 	];
+
+	const itemForOptions = [
+		{ value: 'zipper', label: 'Zipper' },
+		{ value: 'thread', label: 'Thread' },
+	];
+
 
 	return (
 		<AddModal
 			id={modalId}
 			title={
-				updateOrderProperties?.id !== null
-					? "Update Order Properties"
-					: "Order Properties"
+				updateOrderProperties?.uuid !== null
+					? 'Update Order Properties'
+					: 'Order Properties'
 			}
 			onSubmit={handleSubmit(onSubmit)}
 			onClose={onClose}
-			isSmall={true}
-		>
-			<FormField label="type" title="Type" errors={errors}>
+			isSmall={true}>
+			<FormField label='type' title='Type' errors={errors}>
 				<Controller
-					name={"type"}
+					name={'type'}
 					control={control}
 					render={({ field: { onChange } }) => {
 						return (
 							<ReactSelect
-								placeholder="Select Type"
+								placeholder='Select Type'
 								options={typeOptions}
 								value={typeOptions?.filter((item) =>
-									getValues("type").includes(item.value)
+									getValues('type').includes(item.value)
 								)}
 								onChange={(e) => {
 									onChange(e.value);
 								}}
-								isDisabled={updateOrderProperties?.id !== null}
+								isDisabled={
+									updateOrderProperties?.uuid !== null
+								}
 							/>
 						);
 					}}
 				/>
 			</FormField>
-			<Input label="name" {...{ register, errors }} />
-			<Input label="short_name" {...{ register, errors }} />
-			<Input label="remarks" {...{ register, errors }} />
+
+			<FormField label='item_for' title='Item For' errors={errors}>
+				<Controller
+					name={'item_for'}
+					control={control}
+					render={({ field: { onChange } }) => {
+						return (
+							<ReactSelect
+								placeholder='Select Item For'
+								options={itemForOptions}
+								value={itemForOptions?.filter((item) =>
+									getValues('item_for').includes(item.value)
+								)}
+								onChange={(e) => {
+									onChange(e.value);
+								}}
+								isDisabled={
+									updateOrderProperties?.uuid !== null
+								}
+							/>
+						);
+					}}
+				/>
+			</FormField>
+
+			<Input label='name' {...{ register, errors }} />
+			<Input label='short_name' {...{ register, errors }} />
+			<Input label='remarks' {...{ register, errors }} />
 		</AddModal>
 	);
 }

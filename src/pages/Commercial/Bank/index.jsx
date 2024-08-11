@@ -1,12 +1,13 @@
-import { Suspense } from "@/components/Feedback";
-import ReactTable from "@/components/Table";
-import { useAccess, useFetchFunc } from "@/hooks";
-import { DateTime, EditDelete } from "@/ui";
-import PageInfo from "@/util/PageInfo";
-import { lazy, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense } from '@/components/Feedback';
+import ReactTable from '@/components/Table';
+import { useAccess } from '@/hooks';
+import { useCommercialBank } from '@/state/Commercial';
+import { DateTime, EditDelete } from '@/ui';
+import PageInfo from '@/util/PageInfo';
+import { lazy, useEffect, useMemo, useState } from 'react';
 
-const AddOrUpdate = lazy(() => import("./AddOrUpdate"));
-const DeleteModal = lazy(() => import("@/components/Modal/Delete"));
+const AddOrUpdate = lazy(() => import('./AddOrUpdate'));
+const DeleteModal = lazy(() => import('@/components/Modal/Delete'));
 
 // function IndeterminateCheckbox({ indeterminate, ...rest }) {
 // 	const ref = useRef(null);
@@ -28,13 +29,11 @@ const DeleteModal = lazy(() => import("@/components/Modal/Delete"));
 // }
 
 export default function Index() {
-	const info = new PageInfo("Bank", "bank", "commercial__bank");
+	const { data, isLoading, url, deleteData } = useCommercialBank();
+	const info = new PageInfo('Commercial/Bank', url, 'commercial__bank');
+	const haveAccess = useAccess('commercial__bank');
 
-	const [bank, setBank] = useState([]);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState(null);
 	const [rowSelection, setRowSelection] = useState({});
-	const haveAccess = useAccess("commercial__bank");
 
 	const columns = useMemo(
 		() => [
@@ -58,70 +57,69 @@ export default function Index() {
 			// 	),
 			// },
 			{
-				accessorKey: "name",
-				header: "Name",
+				accessorKey: 'name',
+				header: 'Name',
 				enableColumnFilter: false,
 				cell: (info) => info.getValue(),
 			},
 			{
-				accessorKey: "swift_code",
-				header: "Swift Code",
+				accessorKey: 'swift_code',
+				header: 'Swift Code',
 				enableColumnFilter: false,
 				cell: (info) => info.getValue(),
 			},
 			{
-				accessorKey: "address",
-				header: "Address",
-				width: "w-24",
+				accessorKey: 'address',
+				header: 'Address',
+				width: 'w-24',
 				enableColumnFilter: false,
 				cell: (info) => info.getValue(),
 			},
 			{
-				accessorKey: "policy",
-				header: "Policy",
-				width: "w-24",
+				accessorKey: 'policy',
+				header: 'Policy',
+				width: 'w-24',
 				enableColumnFilter: false,
 				cell: (info) => info.getValue(),
 			},
 			{
-				accessorKey: "created_at",
-				header: "Created At",
+				accessorKey: 'created_at',
+				header: 'Created At',
 				enableColumnFilter: false,
-				filterFn: "isWithinRange",
+				filterFn: 'isWithinRange',
 				cell: (info) => <DateTime date={info.getValue()} />,
 			},
 			{
-				accessorKey: "updated_at",
-				header: "Updated",
+				accessorKey: 'updated_at',
+				header: 'Updated',
 				enableColumnFilter: false,
 				cell: (info) => <DateTime date={info.getValue()} />,
 			},
 			{
-				accessorKey: "actions",
-				header: "Actions",
+				accessorKey: 'actions',
+				header: 'Actions',
 				enableColumnFilter: false,
 				enableSorting: false,
-				hidden: !haveAccess.includes("update"),
-				width: "w-24",
+				hidden: !haveAccess.includes('update'),
+				width: 'w-24',
 				cell: (info) => {
 					return (
 						<EditDelete
 							idx={info.row.index}
 							handelUpdate={handelUpdate}
 							handelDelete={handelDelete}
-							showDelete={haveAccess.includes("delete")}
+							showDelete={haveAccess.includes('delete')}
 						/>
 					);
 				},
 			},
 		],
-		[bank]
+		[data]
 	);
 
 	// Fetching data from server
 	useEffect(() => {
 		document.title = info.getTabName();
-		useFetchFunc(info.getFetchUrl(), setBank, setLoading, setError);
 	}, []);
 
 	// Add
@@ -131,13 +129,13 @@ export default function Index() {
 
 	// Update
 	const [updateBank, setUpdateBank] = useState({
-		id: null,
+		uuid: null,
 	});
 
 	const handelUpdate = (idx) => {
 		setUpdateBank((prev) => ({
 			...prev,
-			id: bank[idx].id,
+			uuid: data[idx].uuid,
 		}));
 		window[info.getAddOrUpdateModalId()].showModal();
 	};
@@ -150,36 +148,34 @@ export default function Index() {
 	const handelDelete = (idx) => {
 		setDeleteItem((prev) => ({
 			...prev,
-			itemId: bank[idx].id,
-			itemName: bank[idx].name,
+			itemId: data[idx].uuid,
+			itemName: data[idx].name,
 		}));
 
 		window[info.getDeleteModalId()].showModal();
 	};
 
-	if (loading)
-		return <span className="loading loading-dots loading-lg z-50" />;
-	// if (error) return <h1>Error:{error}</h1>;
+	if (isLoading)
+		return <span className='loading loading-dots loading-lg z-50' />;
 
 	return (
-		<div className="container mx-auto px-2 md:px-4">
+		<div className='container mx-auto px-2 md:px-4'>
 			<ReactTable
 				title={info.getTitle()}
 				// subtitle={`Selected: ${Object.keys(rowSelection).length ?? 0}`}
 				handelAdd={handelAdd}
-				accessor={haveAccess.includes("create")}
-				data={bank}
+				accessor={haveAccess.includes('create')}
+				data={data}
 				columns={columns}
 				rowSelection={rowSelection}
 				setRowSelection={setRowSelection}
-				extraClass="py-2"
+				extraClass='py-2'
 			/>
 
 			<Suspense>
 				<AddOrUpdate
 					modalId={info.getAddOrUpdateModalId()}
 					{...{
-						setBank,
 						updateBank,
 						setUpdateBank,
 					}}
@@ -189,10 +185,12 @@ export default function Index() {
 				<DeleteModal
 					modalId={info.getDeleteModalId()}
 					title={info.getTitle()}
-					deleteItem={deleteItem}
-					setDeleteItem={setDeleteItem}
-					setItems={setBank}
-					uri={info.getDeleteUrl()}
+					{...{
+						deleteItem,
+						setDeleteItem,
+						url,
+						deleteData,
+					}}
 				/>
 			</Suspense>
 		</div>

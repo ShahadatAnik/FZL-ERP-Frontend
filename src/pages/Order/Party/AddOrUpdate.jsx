@@ -1,80 +1,83 @@
-import { AddModal } from "@/components/Modal";
-import {
-	useFetchForRhfReset,
-	usePostFunc,
-	useRHF,
-	useUpdateFunc,
-} from "@/hooks";
-import { Input } from "@/ui";
-import GetDateTime from "@/util/GetDateTime";
-import { BUYER_NULL, BUYER_SCHEMA } from "@util/Schema";
+import { AddModal } from '@/components/Modal';
+import { useFetchForRhfReset, useRHF } from '@/hooks';
+import nanoid from '@/lib/nanoid';
+import { useOrderParty } from '@/state/Order';
+import { Input } from '@/ui';
+import GetDateTime from '@/util/GetDateTime';
+import { DevTool } from '@hookform/devtools';
+import { PARTY_NULL, PARTY_SCHEMA } from '@util/Schema';
 
 export default function Index({
-	modalId = "",
-	setParty,
+	modalId = '',
 	updateParty = {
-		id: null,
+		uuid: null,
 	},
 	setUpdateParty,
 }) {
-	const { register, handleSubmit, errors, reset } = useRHF(
-		BUYER_SCHEMA,
-		BUYER_NULL
+	const { url, updateData, postData } = useOrderParty();
+	const { register, handleSubmit, errors, reset, control } = useRHF(
+		PARTY_SCHEMA,
+		PARTY_NULL
 	);
 
-	useFetchForRhfReset(`/party/${updateParty?.id}`, updateParty?.id, reset);
+	useFetchForRhfReset(
+		`${url}/${updateParty?.uuid}`,
+		updateParty?.uuid,
+		reset
+	);
 
 	const onClose = () => {
 		setUpdateParty((prev) => ({
 			...prev,
-			id: null,
+			uuid: null,
 		}));
-		reset(BUYER_NULL);
+		reset(PARTY_NULL);
 		window[modalId].close();
 	};
 
 	const onSubmit = async (data) => {
 		// Update item
-		if (updateParty?.id !== null) {
+		if (updateParty?.uuid !== null && updateParty?.uuid !== undefined) {
 			const updatedData = {
 				...data,
 				updated_at: GetDateTime(),
 			};
-			useUpdateFunc({
-				uri: `/party/${updateParty?.id}/${data?.name}`,
-				itemId: updateParty.id,
-				data: data,
-				updatedData: updatedData,
-				setItems: setParty,
-				onClose: onClose,
+
+			await updateData.mutateAsync({
+				url: `${url}/${updateParty?.uuid}`,
+				uuid: updateParty?.uuid,
+				updatedData,
+				onClose,
 			});
 
 			return;
 		}
+
+		// Add new item
 		const updatedData = {
 			...data,
+			uuid: nanoid(),
 			created_at: GetDateTime(),
 		};
 
-		usePostFunc({
-			uri: "/party",
-			data: updatedData,
-			setItems: setParty,
-			onClose: onClose,
+		await postData.mutateAsync({
+			url,
+			newData: updatedData,
+			onClose,
 		});
 	};
 
 	return (
 		<AddModal
 			id={modalId}
-			title={updateParty?.id !== null ? "Update Buyer" : "Buyer"}
+			title={updateParty?.uuid !== null ? 'Update Party' : 'Party'}
 			onSubmit={handleSubmit(onSubmit)}
 			onClose={onClose}
-			isSmall={true}
-		>
-			<Input label="name" {...{ register, errors }} />
-			<Input label="short_name" {...{ register, errors }} />
-			<Input label="remarks" {...{ register, errors }} />
+			isSmall={true}>
+			<Input label='name' {...{ register, errors }} />
+			<Input label='short_name' {...{ register, errors }} />
+			<Input label='remarks' {...{ register, errors }} />
+			<DevTool control={control} placement='top-left' />
 		</AddModal>
 	);
 }

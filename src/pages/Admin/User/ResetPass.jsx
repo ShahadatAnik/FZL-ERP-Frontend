@@ -1,14 +1,13 @@
-import { AddModal } from "@/components/Modal";
-import { useRHF, useUpdateFunc } from "@/hooks";
-import { PasswordInput } from "@/ui";
-import GetDateTime from "@/util/GetDateTime";
-import { RESET_PASSWORD_NULL, RESET_PASSWORD_SCHEMA } from "@/util/Schema";
+import { AddModal } from '@/components/Modal';
+import { useRHF, useUpdateFunc } from '@/hooks';
+import { PasswordInput } from '@/ui';
+import GetDateTime from '@/util/GetDateTime';
+import { RESET_PASSWORD_NULL, RESET_PASSWORD_SCHEMA } from '@/util/Schema';
 
 export default function Index({
-	modalId = "",
+	modalId = '',
 	resPass = { id: null, name: null },
 	setResPass,
-	setUsers,
 }) {
 	const { register, handleSubmit, errors } = useRHF(
 		RESET_PASSWORD_SCHEMA,
@@ -26,18 +25,17 @@ export default function Index({
 
 	const onSubmit = async (data) => {
 		// Update item
-		if (resPass?.id !== null) {
+		if (resPass?.uuid !== null && resPass?.uuid !== undefined) {
 			const updatedData = {
 				...data,
 				updated_at: GetDateTime(),
 			};
 
 			await useUpdateFunc({
-				uri: `/user/pass/${resPass?.id}/${resPass?.name}`,
-				itemId: resPass.id,
+				uri: `/hr/user/password/${resPass?.uuid}`,
+				itemId: resPass.uuid,
 				data: data,
 				updatedData: updatedData,
-				setItems: setUsers,
 				onClose: onClose,
 			});
 
@@ -49,23 +47,22 @@ export default function Index({
 		<AddModal
 			id={modalId}
 			title={
-				resPass?.id !== null
-					? "Reset Password: " + resPass?.name
-					: "Reset Password"
+				resPass?.uuid !== null
+					? 'Reset Password: ' + resPass?.name
+					: 'Reset Password'
 			}
 			onSubmit={handleSubmit(onSubmit)}
 			onClose={onClose}
-			isSmall={true}
-		>
+			isSmall={true}>
 			<PasswordInput
-				title="Reset Password"
-				label="pass"
+				title='Reset Password'
+				label='pass'
 				// is_title_needed="false"
 				{...{ register, errors }}
 			/>
 			<PasswordInput
-				title="Confirm Password"
-				label="repeatPass"
+				title='Confirm Password'
+				label='repeatPass'
 				// is_title_needed="false"
 				{...{ register, errors }}
 			/>

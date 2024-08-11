@@ -29,6 +29,12 @@ function useFetch(url, dependencies = []) {
 	}, dependencies);
 }
 
+// async function useFetch(url, dependencies = []) {
+// 	const val = await api.get(url).then((res) => res?.data?.data);
+
+// 	return val;
+// }
+
 async function defaultFetchFunc(
 	url,
 	setData,
@@ -74,7 +80,7 @@ const useFetchForRhfResetForUserAccess = async (uri, returnId, reset) => {
 		if (returnId === null) return;
 
 		api.get(uri).then((res) => {
-			const data = res?.data[0];
+			const data = res?.data?.data[0];
 			const result = {};
 
 			Object.entries(data).forEach(([key, value]) => {

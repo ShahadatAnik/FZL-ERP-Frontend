@@ -1,24 +1,21 @@
-import { AddModal } from "@/components/Modal";
-import {
-	useFetch,
-	useFetchForRhfReset,
-	usePostFunc,
-	useRHF,
-	useUpdateFunc,
-} from "@/hooks";
-import { FormField, Input, ReactSelect } from "@/ui";
-import GetDateTime from "@/util/GetDateTime";
-import { MARKETING_NULL, MARKETING_SCHEMA } from "@util/Schema";
+import { AddModal } from '@/components/Modal';
+import { useFetch, useFetchForRhfReset, useRHF } from '@/hooks';
+import { FormField, Input, ReactSelect } from '@/ui';
+import GetDateTime from '@/util/GetDateTime';
+import { MARKETING_NULL, MARKETING_SCHEMA } from '@util/Schema';
+import nanoid from '@/lib/nanoid';
+import { useOrderMarketing } from '@/state/Order';
 
 export default function Index({
-	modalId = "",
+	modalId = '',
 	setMarketing,
 	updateMarketing = {
-		id: null,
-		user_id: null,
+		user_uuid: null,
+		uuid: null,
 	},
 	setUpdateMarketing,
 }) {
+	const { url, updateData, postData } = useOrderMarketing();
 	const {
 		register,
 		handleSubmit,
@@ -30,18 +27,18 @@ export default function Index({
 	} = useRHF(MARKETING_SCHEMA, MARKETING_NULL);
 
 	useFetchForRhfReset(
-		`/marketing/${updateMarketing?.id}`,
-		updateMarketing?.id,
+		`/public/marketing/${updateMarketing?.uuid}`,
+		updateMarketing?.uuid,
 		reset
 	);
 
-	const { value: user } = useFetch("/marketing-user/value/label");
+	const { value: user } = useFetch('/other/marketing-user/value/label');
 
 	const onClose = () => {
 		setUpdateMarketing((prev) => ({
 			...prev,
-			id: null,
-			user_id: null,
+			uuid: null,
+			user_uuid: null,
 		}));
 		reset(MARKETING_NULL);
 		window[modalId].close();
@@ -49,18 +46,20 @@ export default function Index({
 
 	const onSubmit = async (data) => {
 		// Update item
-		if (updateMarketing?.id !== null) {
+		if (
+			updateMarketing?.uuid !== null &&
+			updateMarketing?.uuid !== undefined
+		) {
 			const updatedData = {
 				...data,
 				updated_at: GetDateTime(),
 			};
-			await useUpdateFunc({
-				uri: `/marketing/${updateMarketing?.id}/${data?.name}`,
-				itemId: updateMarketing.id,
-				data: data,
-				updatedData: updatedData,
-				setItems: setMarketing,
-				onClose: onClose,
+
+			await updateData.mutateAsync({
+				url: `${url}/${updateMarketing?.uuid}`,
+				uuid: updateMarketing?.id,
+				updatedData,
+				onClose,
 			});
 
 			return;
@@ -68,14 +67,14 @@ export default function Index({
 		// Add item
 		const updatedData = {
 			...data,
+			uuid: nanoid(),
 			created_at: GetDateTime(),
 		};
 
-		await usePostFunc({
-			uri: "/marketing",
-			data: updatedData,
-			setItems: setMarketing,
-			onClose: onClose,
+		await postData.mutateAsync({
+			url,
+			newData: updatedData,
+			onClose,
 		});
 	};
 
@@ -83,34 +82,37 @@ export default function Index({
 		<AddModal
 			id={modalId}
 			title={
-				updateMarketing?.id !== null ? "Update Marketing" : "Marketing"
+				updateMarketing?.uuid !== null
+					? 'Update Marketing'
+					: 'Marketing'
 			}
 			onSubmit={handleSubmit(onSubmit)}
 			onClose={onClose}
-			isSmall={true}
-		>
-			<FormField label="user_id" title="User" errors={errors}>
+			isSmall={true}>
+			<FormField label='user_uuid' title='User' errors={errors}>
 				<Controller
-					name={"user_id"}
+					name={'user_uuid'}
 					control={control}
 					render={({ field: { onChange } }) => {
 						return (
 							<ReactSelect
-								placeholder="Select User"
+								placeholder='Select User'
 								options={user}
 								value={user?.find(
 									(item) =>
-										item.value === getValues("user_id")
+										item.value === getValues('user_uuid')
 								)}
-								onChange={(e) => onChange(e.value)}
+								onChange={(e) => {
+									onChange(e.value);
+								}}
 							/>
 						);
 					}}
 				/>
 			</FormField>
-			<Input label="name" {...{ register, errors }} />
-			<Input label="short_name" {...{ register, errors }} />
-			<Input label="remarks" {...{ register, errors }} />
+			<Input label='name' {...{ register, errors }} />
+			<Input label='short_name' {...{ register, errors }} />
+			<Input label='remarks' {...{ register, errors }} />
 		</AddModal>
 	);
 }

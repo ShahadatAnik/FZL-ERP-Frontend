@@ -14,7 +14,7 @@ const ErrorToast = (text) => toast.error(<ToastBody {...{ text }} />);
 const ShowLocalToast = ({ type, message }) => {
 	switch (type) {
 		case 'create':
-		case 'update':
+		case 'insert':
 			SuccessToast(message);
 			break;
 		case 'delete':
@@ -22,6 +22,7 @@ const ShowLocalToast = ({ type, message }) => {
 			ErrorToast(message);
 			break;
 		case 'warning':
+		case 'update':
 			WarningToast(message);
 			break;
 		default:
