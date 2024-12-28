@@ -85,7 +85,9 @@ export default function Information({ challan }) {
 			},
 			{
 				label: 'Updated At',
-				value: format(new Date(updated_at), 'dd/MM/yy'),
+				value: updated_at
+					? format(new Date(updated_at), 'dd/MM/yy')
+					: '--',
 			},
 			{
 				label: 'Remarks',
