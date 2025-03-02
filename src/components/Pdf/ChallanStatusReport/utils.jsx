@@ -48,6 +48,7 @@ export const getPdfHeader = (data) => {
 					},
 
 					`Order No.: ${data[0].order_number} \n`,
+					`Challan Date: ${format(new Date(data[0].created_at), 'dd-MM-yyyy')} \n`,
 				],
 				alignment: 'right',
 			},
