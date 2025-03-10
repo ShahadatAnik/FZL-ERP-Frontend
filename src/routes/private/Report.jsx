@@ -29,6 +29,7 @@ const ChallanStatus = lazy(() => import('@/pages/Report/ChallanStatus'));
 const OrderTracking = lazy(() => import('@/pages/Report/OrderTracking'));
 const OrderSummary = lazy(() => import('@/pages/Report/OrderSummary'));
 const DeliveryReport = lazy(() => import('@/pages/Report/DeliveryReport'));
+const ThreadDelivery = lazy(() => import('@/pages/Report/ThreadDelivery'));
 
 export const ReportRoutes = [
 	{
@@ -131,7 +132,7 @@ export const ReportRoutes = [
 				path: '/report/order-status',
 				element: <OrderStatus />,
 				page_name: 'report__order_status',
-				actions: ['read', 'show_own_orders','show_price'],
+				actions: ['read', 'show_own_orders', 'show_price'],
 			},
 			{
 				name: 'Approved Orders',
@@ -167,6 +168,13 @@ export const ReportRoutes = [
 				element: <DeliveryReport />,
 				page_name: 'report__delivery_report',
 				actions: ['read', 'show_price', 'show_own_orders'],
+			},
+			{
+				name: 'Thread Delivery',
+				path: '/report/thread-delivery',
+				element: <ThreadDelivery />,
+				page_name: 'report__thread_delivery',
+				actions: ['read', 'show_own_orders'],
 			},
 		],
 	},

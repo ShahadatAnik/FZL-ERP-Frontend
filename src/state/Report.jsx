@@ -211,6 +211,15 @@ export const useSample = (
 		enabled,
 	});
 
+export const useThreadDelivery = (date, toDate, query) =>
+	createGlobalState({
+		queryKey: reportQK.threadDelivery(date, toDate, query),
+		url: query
+			? `/report/count-length-wise-delivery-report?from=${date}&to=${toDate}` +
+				query
+			: `/report/count-length-wise-delivery-report?from=${date}&to=${toDate}`,
+	});
+
 export const useOrderTracing = (date, toDate, query) =>
 	createGlobalState({
 		queryKey: reportQK.orderTracking(date, toDate, query),

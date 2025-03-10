@@ -1667,6 +1667,16 @@ export const reportQK = {
 		is_sample,
 		...(query ? [query] : []),
 	],
+
+	// * Thread delivery
+	threadDelivery: (date, toDate, query) => [
+		...reportQK.all(),
+		'thread-delivery',
+		date,
+		toDate,
+		...(query ? [query] : []),
+	],
+
 	sampleCombined: (date, is_sample, query) => [
 		...reportQK.all(),
 		'sample-report-by-date-combined',
