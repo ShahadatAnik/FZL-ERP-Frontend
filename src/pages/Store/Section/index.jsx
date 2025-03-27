@@ -21,7 +21,8 @@ export default function Index() {
 		url,
 		'store__section'
 	);
-	const haveAccess = useAccess('store__section');
+	const haveAccessRm = useAccess('store__rm_section');
+	const haveAccessAccessor = useAccess('store__accessories_section');
 
 	useEffect(() => {
 		document.title = info.getTabName();
@@ -77,7 +78,12 @@ export default function Index() {
 				header: 'Actions',
 				enableColumnFilter: false,
 				enableSorting: false,
-				hidden: !haveAccess?.includes('update'),
+				hidden: !(
+					haveAccessRm?.includes('update') ||
+					haveAccessAccessor?.includes('update') ||
+					haveAccessRm?.includes('delete') ||
+					haveAccessAccessor?.includes('delete')
+				),
 				width: 'w-24',
 				cell: (info) => {
 					return (
@@ -85,7 +91,14 @@ export default function Index() {
 							idx={info.row.index}
 							handelUpdate={handelUpdate}
 							handelDelete={handelDelete}
-							showDelete={haveAccess?.includes('delete')}
+							showUpdate={
+								haveAccessRm?.includes('update') ||
+								haveAccessAccessor?.includes('update')
+							}
+							showDelete={
+								haveAccessRm?.includes('delete') ||
+								haveAccessAccessor?.includes('delete')
+							}
 						/>
 					);
 				},
@@ -135,7 +148,10 @@ export default function Index() {
 			<ReactTable
 				title={info.getTitle()}
 				handelAdd={handelAdd}
-				accessor={haveAccess.includes('create')}
+				accessor={
+					haveAccessRm.includes('create') ||
+					haveAccessAccessor.includes('create')
+				}
 				data={data}
 				columns={columns}
 			/>

@@ -14,7 +14,8 @@ const DeleteModal = lazy(() => import('@/components/Modal/Delete'));
 export default function Index() {
 	const { data, isLoading, url, deleteData } = usePurchaseLog('rm');
 	const info = new PageInfo('Store / Purchase', url);
-	const haveAccess = useAccess('store__log');
+	const haveAccessRm = useAccess('store__rm_log');
+	const haveAccessAccessor = useAccess('store__accessories_log');
 
 	const columns = useMemo(
 		() => [
@@ -114,7 +115,12 @@ export default function Index() {
 				header: 'Actions',
 				enableColumnFilter: false,
 				enableSorting: false,
-				hidden: !haveAccess.includes('update_log'),
+				hidden: !(
+					haveAccessRm?.includes('update_log') ||
+					haveAccessAccessor?.includes('update_log') ||
+					haveAccessRm?.includes('delete_log') ||
+					haveAccessAccessor?.includes('delete_log')
+				),
 				width: 'w-24',
 				cell: (info) => {
 					return (
@@ -122,7 +128,14 @@ export default function Index() {
 							idx={info.row.index}
 							handelUpdate={handelUpdate}
 							handelDelete={handelDelete}
-							// showDelete={false}
+							showUpdate={
+								haveAccessRm?.includes('update_log') ||
+								haveAccessAccessor?.includes('update_log')
+							}
+							showDelete={
+								haveAccessRm?.includes('delete_log') ||
+								haveAccessAccessor?.includes('delete_log')
+							}
 						/>
 					);
 				},

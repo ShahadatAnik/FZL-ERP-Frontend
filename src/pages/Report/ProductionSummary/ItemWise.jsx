@@ -54,19 +54,13 @@ export default function Index() {
 	if (isLoading)
 		return <span className='loading loading-dots loading-lg z-50' />;
 
+	const Total = data.reduce((acc, curr) => acc + curr.total_production, 0);
+
 	return (
 		<ReactTable
 			key='Thread Status'
 			showDateRange={false}
 			title={'Item Wise'}
-			subtitle={
-				<div className='flex flex-col'>
-					<span>
-						delivered = when the packing list is warehouse out
-					</span>
-					<span>balance = order qty - delivered</span>
-				</div>
-			}
 			accessor={false}
 			data={data}
 			columns={columns}
@@ -94,6 +88,11 @@ export default function Index() {
 					/>
 				</div>
 			}
-		/>
+		>
+			<tr className='bg-slate-200'>
+				<td className='px-3 text-right font-semibold'>Total</td>
+				<td className='px-3 font-semibold'>{Total}</td>
+			</tr>
+		</ReactTable>
 	);
 }

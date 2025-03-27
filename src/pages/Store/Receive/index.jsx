@@ -13,12 +13,12 @@ const DeleteModal = lazy(() => import('@/components/Modal/Delete'));
 
 export default function Index() {
 	const navigate = useNavigate();
-	const haveAccess = useAccess('store__receive');
+	const haveAccess = useAccess('store__receive_rm');
 	const { data, isLoading, url, deleteData } = usePurchaseDescription('rm');
 	const info = new PageInfo(
 		'Store / Material Receive',
 		url,
-		'store__receive'
+		'store__receive_rm'
 	);
 
 	useEffect(() => {
@@ -110,10 +110,10 @@ export default function Index() {
 	);
 
 	// Add
-	const handelAdd = () => navigate('/store/receive/entry');
+	const handelAdd = () => navigate('/store/receive-rm/entry');
 
 	const handelUpdate = (idx) => {
-		navigate(`/store/receive/${data[idx].uuid}/update`);
+		navigate(`/store/receive-rm/${data[idx].uuid}/update`);
 	};
 
 	// Delete

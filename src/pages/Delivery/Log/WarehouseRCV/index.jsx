@@ -83,6 +83,12 @@ export default function Index() {
 				),
 			},
 			{
+				accessorKey: 'item_name',
+				header: 'Item',
+				enableColumnFilter: false,
+				cell: (info) => info.getValue(),
+			},
+			{
 				accessorKey: 'warehouse_received_date',
 				header: 'Received Date',
 				enableColumnFilter: false,

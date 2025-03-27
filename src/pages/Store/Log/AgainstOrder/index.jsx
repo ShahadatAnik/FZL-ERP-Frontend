@@ -30,7 +30,8 @@ export default function Index() {
 		useSliderAssemblyStock();
 
 	const info = new PageInfo('Store / Transfer Against Order', url);
-	const haveAccess = useAccess('store__log');
+	const haveAccessRm = useAccess('store__rm_log');
+	const haveAccessAccessor = useAccess('store__accessories_log');
 
 	const columns = useMemo(
 		() => [
@@ -124,7 +125,12 @@ export default function Index() {
 				header: 'Actions',
 				enableColumnFilter: false,
 				enableSorting: false,
-				hidden: !haveAccess.includes('update_log_against_order'),
+				hidden: !(
+					haveAccessRm?.includes('update_log_against_order') ||
+					haveAccessAccessor?.includes('update_log_against_order') ||
+					haveAccessRm?.includes('delete_log_against_order') ||
+					haveAccessAccessor?.includes('delete_log_against_order')
+				),
 				width: 'w-24',
 				cell: (info) => {
 					return (
@@ -132,9 +138,22 @@ export default function Index() {
 							idx={info.row.index}
 							handelUpdate={handelUpdate}
 							handelDelete={handelDelete}
-							showDelete={haveAccess.includes(
-								'delete_log_against_order'
-							)}
+							showUpdate={
+								haveAccessRm?.includes(
+									'update_log_against_order'
+								) ||
+								haveAccessAccessor?.includes(
+									'update_log_against_order'
+								)
+							}
+							showDelete={
+								haveAccessRm?.includes(
+									'delete_log_against_order'
+								) ||
+								haveAccessAccessor?.includes(
+									'delete_log_against_order'
+								)
+							}
 						/>
 					);
 				},

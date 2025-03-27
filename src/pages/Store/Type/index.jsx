@@ -16,7 +16,8 @@ export default function Index() {
 	const { data, isLoading, url, deleteData } = useMaterialType();
 	const { invalidateQuery: invalidateMaterialType } = useOtherMaterialType();
 	const info = new PageInfo('Store / Material Type', url, 'store__type');
-	const haveAccess = useAccess('store__type');
+	const haveAccessRm = useAccess('store__rm_type');
+	const haveAccessAccessor = useAccess('store__accessories_type');
 
 	useEffect(() => {
 		document.title = info.getTabName();
@@ -72,7 +73,12 @@ export default function Index() {
 				header: 'Actions',
 				enableColumnFilter: false,
 				enableSorting: false,
-				hidden: !haveAccess.includes('update'),
+				hidden: !(
+					haveAccessRm?.includes('update') ||
+					haveAccessAccessor?.includes('update') ||
+					haveAccessRm?.includes('delete') ||
+					haveAccessAccessor?.includes('delete')
+				),
 				width: 'w-24',
 				cell: (info) => {
 					return (
@@ -80,7 +86,14 @@ export default function Index() {
 							idx={info.row.index}
 							handelUpdate={handelUpdate}
 							handelDelete={handelDelete}
-							showDelete={haveAccess.includes('delete')}
+							showUpdate={
+								haveAccessRm?.includes('update') ||
+								haveAccessAccessor?.includes('update')
+							}
+							showDelete={
+								haveAccessRm?.includes('delete') ||
+								haveAccessAccessor?.includes('delete')
+							}
 						/>
 					);
 				},
@@ -130,7 +143,10 @@ export default function Index() {
 			<ReactTable
 				title={info.getTitle()}
 				handelAdd={handelAdd}
-				accessor={haveAccess.includes('create')}
+				accessor={
+					haveAccessRm.includes('create') ||
+					haveAccessAccessor.includes('create')
+				}
 				data={data}
 				columns={columns}
 			/>

@@ -16,7 +16,9 @@ export default function Index() {
 	const { invalidateQuery: invalidateVendor } = useOtherVendor();
 	const { data, isLoading, url, deleteData } = usePurchaseVendor();
 	const info = new PageInfo('Store / Vendor', url, 'store__vendor');
-	const haveAccess = useAccess('store__vendor');
+
+	const haveAccessRm = useAccess('store__rm_vendor');
+	const haveAccessAccessor = useAccess('store__accessories_vendor');
 
 	const columns = useMemo(
 		() => [
@@ -89,7 +91,12 @@ export default function Index() {
 				header: 'Actions',
 				enableColumnFilter: false,
 				enableSorting: false,
-				hidden: !haveAccess.includes('update'),
+				hidden: !(
+					haveAccessRm?.includes('update') ||
+					haveAccessAccessor?.includes('update') ||
+					haveAccessRm?.includes('delete') ||
+					haveAccessAccessor?.includes('delete')
+				),
 				width: 'w-24',
 				cell: (info) => {
 					return (
@@ -97,7 +104,14 @@ export default function Index() {
 							idx={info.row.index}
 							handelUpdate={handelUpdate}
 							handelDelete={handelDelete}
-							showDelete={haveAccess.includes('delete')}
+							showUpdate={
+								haveAccessRm?.includes('update') ||
+								haveAccessAccessor?.includes('update')
+							}
+							showDelete={
+								haveAccessRm?.includes('delete') ||
+								haveAccessAccessor?.includes('delete')
+							}
 						/>
 					);
 				},
@@ -152,7 +166,10 @@ export default function Index() {
 			<ReactTable
 				title={info.getTitle()}
 				handelAdd={handelAdd}
-				accessor={haveAccess.includes('create')}
+				accessor={
+					haveAccessRm.includes('create') ||
+					haveAccessAccessor.includes('create')
+				}
 				data={data}
 				columns={columns}
 			/>
