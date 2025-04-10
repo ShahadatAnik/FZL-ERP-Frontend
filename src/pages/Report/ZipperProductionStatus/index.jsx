@@ -44,7 +44,9 @@ export default function Index() {
 	const columns = useMemo(
 		() => [
 			{
-				accessorKey: 'id',
+				accessorFn: (row) =>
+					`${row.is_sample ? 'Y' : 'N'}/${row.is_bill ? 'Y' : 'N'}/${row.is_cash ? 'Y' : 'N'}`,
+				id: 'id',
 				header: 'Sample/Bill/Cash',
 				enableColumnFilter: false,
 				width: 'w-28',
@@ -72,7 +74,7 @@ export default function Index() {
 				),
 			},
 			{
-				accessorFn: (row) => format(row.order_created_at, 'dd/MM/yy'),
+				accessorFn: (row) => format(row.order_created_at, 'dd MMM, yy'),
 				id: 'order_created_at',
 				header: 'Created At',
 				enableColumnFilter: false,
@@ -80,13 +82,14 @@ export default function Index() {
 					<DateTime
 						date={info.row.original.order_created_at}
 						isTime={false}
+						customizedDateFormate='dd MMM, yy'
 					/>
 				),
 			},
 			{
 				accessorFn: (row) =>
 					row.order_description_updated_at
-						? format(row.order_description_updated_at, 'dd/MM/yy')
+						? format(row.order_description_updated_at, 'dd MMM, yy')
 						: '--',
 				id: 'order_description_updated_at',
 				header: 'Updated At',
@@ -95,6 +98,7 @@ export default function Index() {
 					<DateTime
 						date={info.row.original.order_description_updated_at}
 						isTime={false}
+						customizedDateFormate='dd MMM, yy'
 					/>
 				),
 			},

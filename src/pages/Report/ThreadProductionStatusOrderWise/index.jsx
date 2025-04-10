@@ -61,7 +61,7 @@ export default function Index() {
 				},
 			},
 			{
-				accessorFn: (row) => format(row.order_created_at, 'dd/MM/yy'),
+				accessorFn: (row) => format(row.order_created_at, 'dd MMM, yy'),
 				id: 'order_created_at',
 				header: 'Created At',
 				enableColumnFilter: false,
@@ -69,13 +69,14 @@ export default function Index() {
 					<DateTime
 						date={info.row.original.order_created_at}
 						isTime={false}
+						customizedDateFormate='dd MMM, yy'
 					/>
 				),
 			},
 			{
 				accessorFn: (row) =>
 					row.order_updated_at
-						? format(row.order_updated_at, 'dd/MM/yy')
+						? format(row.order_updated_at, 'dd MMM, yy')
 						: '--',
 				id: 'order_updated_at',
 				header: 'Updated At',
@@ -84,6 +85,7 @@ export default function Index() {
 					<DateTime
 						date={info.row.original.order_updated_at}
 						isTime={false}
+						customizedDateFormate='dd MMM, yy'
 					/>
 				),
 			},

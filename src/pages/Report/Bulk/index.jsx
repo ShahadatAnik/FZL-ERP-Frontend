@@ -119,11 +119,16 @@ export default function Index() {
 				cell: (info) => info.getValue(),
 			},
 			{
-				accessorKey: 'issue_date',
+				accessorFn: (row) => format(row.issue_date, 'dd MMM, yy'),
+				id: 'issue_date',
 				header: 'Order Date',
 				enableColumnFilter: false,
 				cell: (info) => (
-					<DateTime date={info.getValue()} isTime={false} />
+					<DateTime
+						date={info.getValue()}
+						isTime={false}
+						customizedDateFormate='dd MMM, yy'
+					/>
 				),
 			},
 			{

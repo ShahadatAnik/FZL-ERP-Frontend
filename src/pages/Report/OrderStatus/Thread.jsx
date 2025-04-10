@@ -160,19 +160,30 @@ export default function Index() {
 				cell: (info) => info.getValue(),
 			},
 			{
-				accessorKey: 'created_at',
+				accessorFn: (row) => format(row.created_at, 'dd MMM,yyyy'),
+				id: 'created_at',
 				header: 'Created',
 				enableColumnFilter: false,
 				cell: (info) => (
-					<DateTime date={info.getValue()} isTime={false} />
+					<DateTime
+						date={info.getValue()}
+						isTime={false}
+						customizedDateFormate='dd MMM,yyyy'
+					/>
 				),
 			},
 			{
-				accessorKey: 'updated_at',
+				accessorFn: (row) =>
+					row.updated_at && format(row.updated_at, 'dd MMM,yyyy'),
+				id: 'updated_at',
 				header: 'Updated',
 				enableColumnFilter: false,
 				cell: (info) => (
-					<DateTime date={info.getValue()} isTime={false} />
+					<DateTime
+						date={info.getValue()}
+						isTime={false}
+						customizedDateFormate='dd MMM,yyyy'
+					/>
 				),
 			},
 		],

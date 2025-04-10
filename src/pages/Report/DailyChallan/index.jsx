@@ -43,7 +43,7 @@ export default function Index() {
 	const columns = useMemo(
 		() => [
 			{
-				accessorFn: (row) => format(row.challan_date, 'dd/MM/yy'),
+				accessorFn: (row) => format(row.challan_date, 'dd MMM, yy'),
 				id: 'challan_date',
 				header: 'Challan Date',
 				enableColumnFilter: false,
@@ -51,6 +51,7 @@ export default function Index() {
 					<DateTime
 						date={info.row.original.challan_date}
 						isTime={false}
+						customizedDateFormate='dd MMM, yy'
 					/>
 				),
 			},
@@ -95,11 +96,15 @@ export default function Index() {
 				cell: (info) => info.getValue(),
 			},
 			{
-				accessorKey: 'gate_pass',
+				accessorFn: (row) => (row.gate_pass ? 'YES' : 'NO'),
+				id: 'gate_pass',
 				header: 'Gate Pass',
 				enableColumnFilter: false,
 				cell: (info) => (
-					<StatusButton size='btn-xs' value={info.getValue()} />
+					<StatusButton
+						size='btn-xs'
+						value={info.row.original.gate_pass}
+					/>
 				),
 			},
 			{

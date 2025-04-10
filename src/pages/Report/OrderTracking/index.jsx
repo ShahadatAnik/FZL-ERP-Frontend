@@ -47,7 +47,8 @@ export default function Index() {
 				},
 			},
 			{
-				accessorFn: (row) => format(row.order_created_at, 'dd/MM/yy'),
+				accessorFn: (row) =>
+					format(row.order_created_at, 'dd MMM, yyyy'),
 				id: 'order_created_at',
 				header: (
 					<>
@@ -60,6 +61,7 @@ export default function Index() {
 					<DateTime
 						date={info.row.original.order_created_at}
 						isTime={false}
+						customizedDateFormate='dd MMM, yyyy'
 					/>
 				),
 			},
@@ -111,7 +113,7 @@ export default function Index() {
 				},
 			},
 			{
-				accessorFn: (row) => format(row.challan_date, 'dd/MM/yy'),
+				accessorFn: (row) => format(row.challan_date, 'dd MMM, yyyy'),
 				id: 'challan_date',
 				header: (
 					<>
@@ -124,12 +126,13 @@ export default function Index() {
 					<DateTime
 						date={info.row.original.challan_date}
 						isTime={false}
+						customizedDateFormate='dd MMM, yyyy'
 					/>
 				),
 			},
 			{
 				accessorFn: (row) =>
-					format(row.challan_delivered_date, 'dd/MM/yy'),
+					format(row.challan_delivered_date, 'dd MMM, yyyy'),
 				id: 'challan_delivered_date ',
 				header: (
 					<>
@@ -142,6 +145,7 @@ export default function Index() {
 					<DateTime
 						date={info.row.original.challan_delivered_date}
 						isTime={false}
+						customizedDateFormate='dd MMM, yyyy'
 					/>
 				),
 			},
@@ -160,7 +164,9 @@ export default function Index() {
 
 			// ? Vehicle
 			{
-				accessorKey: 'vehicle_name',
+				accessorFn: (row) =>
+					`${row.vehicle_name ? row.vehicle_name : '--'}/${row.vehicle_number ? row.vehicle_number : '--'}/${row.driver_name ? row.driver_name : '--'}`,
+				id: 'vehicle_name',
 				header: 'Vehicle',
 				enableColumnFilter: false,
 				width: 'w-36',
@@ -189,7 +195,7 @@ export default function Index() {
 
 			{
 				accessorFn: (row) =>
-					format(row.swatch_approval_date, 'dd/MM/yy'),
+					format(row.swatch_approval_date, 'dd MMM, yyyy'),
 				id: 'swatch_approval_date',
 				header: (
 					<>
@@ -202,6 +208,7 @@ export default function Index() {
 					<DateTime
 						date={info.row.original.swatch_approval_date}
 						isTime={false}
+						customizedDateFormate='dd MMM, yyyy'
 					/>
 				),
 			},
@@ -456,21 +463,33 @@ export default function Index() {
 				enableColumnFilter: false,
 				cell: (info) => info.getValue(),
 			},
-
 			{
-				accessorKey: 'order_created_at',
+				accessorFn: (row) =>
+					format(row.order_created_at, 'dd MMM,yyyy'),
+				id: 'order_created_at',
 				header: 'Created',
 				enableColumnFilter: false,
 				cell: (info) => (
-					<DateTime date={info.getValue()} isTime={false} />
+					<DateTime
+						date={info.getValue()}
+						isTime={false}
+						customizedDateFormate='dd MMM,yyyy'
+					/>
 				),
 			},
 			{
-				accessorKey: 'order_updated_at',
+				accessorFn: (row) =>
+					row.updated_at &&
+					format(row.order_updated_at, 'dd MMM,yyyy'),
+				id: 'order_updated_at',
 				header: 'Updated',
 				enableColumnFilter: false,
 				cell: (info) => (
-					<DateTime date={info.getValue()} isTime={false} />
+					<DateTime
+						date={info.getValue()}
+						isTime={false}
+						customizedDateFormate='dd MMM,yyyy'
+					/>
 				),
 			},
 			{

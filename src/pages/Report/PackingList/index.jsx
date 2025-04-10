@@ -85,21 +85,29 @@ export default function Index() {
 				},
 			},
 			{
-				accessorKey: 'is_warehouse_received',
+				accessorFn: (row) => (row.is_warehouse_received ? 'Y' : 'N'),
+				id: 'is_warehouse_received',
 				header: 'Received',
 				enableColumnFilter: false,
 				width: 'w-32',
 				cell: (info) => (
-					<StatusButton size='btn-xs' value={info.getValue()} />
+					<StatusButton
+						size='btn-xs'
+						value={info.row.original.is_warehouse_received}
+					/>
 				),
 			},
 			{
-				accessorKey: 'gate_pass',
+				accessorFn: (row) => (row.gate_pass ? 'Y' : 'N'),
+				id: 'gate_pass',
 				header: 'Warehouse Out',
 				enableColumnFilter: false,
 				width: 'w-32',
 				cell: (info) => (
-					<StatusButton size='btn-xs' value={info.getValue()} />
+					<StatusButton
+						size='btn-xs'
+						value={info.row.original.gate_pass}
+					/>
 				),
 			},
 			{
@@ -166,7 +174,9 @@ export default function Index() {
 				cell: (info) => info.getValue(),
 			},
 			{
-				accessorKey: 'count',
+				accessorFn: (row) =>
+					`${row.packing_list_wise_rank}/${row.packing_list_wise_count}`,
+				id: 'count',
 				header: 'Count',
 				enableColumnFilter: false,
 				cell: (info) => {
@@ -184,18 +194,31 @@ export default function Index() {
 				cell: (info) => info.getValue(),
 			},
 			{
-				accessorKey: 'created_at',
-				header: 'Created At',
+				accessorFn: (row) => format(row.created_at, 'dd MMM,yyyy'),
+				id: 'created_at',
+				header: 'Created',
 				enableColumnFilter: false,
-				width: 'w-32',
-				cell: (info) => info.getValue(),
+				cell: (info) => (
+					<DateTime
+						date={info.getValue()}
+						isTime={false}
+						customizedDateFormate='dd MMM,yyyy'
+					/>
+				),
 			},
 			{
-				accessorKey: 'updated_at',
-				header: 'Updated At',
+				accessorFn: (row) =>
+					row.updated_at && format(row.updated_at, 'dd MMM,yyyy'),
+				id: 'updated_at',
+				header: 'Updated',
 				enableColumnFilter: false,
-				width: 'w-32',
-				cell: (info) => info.getValue(),
+				cell: (info) => (
+					<DateTime
+						date={info.getValue()}
+						isTime={false}
+						customizedDateFormate='dd MMM,yyyy'
+					/>
+				),
 			},
 			{
 				accessorKey: 'remarks',
