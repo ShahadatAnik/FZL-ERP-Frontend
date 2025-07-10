@@ -1,13 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/context/auth';
 import { useProductionStatementReport } from '@/state/Report';
 import { format } from 'date-fns';
 import { LoaderCircle } from 'lucide-react';
 import { useAccess } from '@/hooks';
 
+import PdfWorker from '@/components/Pdf/pdfWorker.js?worker'; // Vite example (or similar for Webpack)
 import Pdf from '@/components/Pdf/ProductionStatement';
-
-import { api } from '@lib/api';
 
 import Excel from './Excel';
 import Header from './Header';
@@ -23,8 +22,10 @@ const getPath = (haveAccess, userUUID) => {
 export default function index() {
 	const haveAccess = useAccess('report__production_statement');
 	const { user } = useAuth();
-	const [isLoading, setIsLoading] = useState(false);
 
+	const [isGenerating, setIsGenerating] = useState(false);
+	const [pdfUrl, setPdfUrl] = useState(null);
+	const [error, setError] = useState(null);
 	const [from, setFrom] = useState(new Date());
 	const [to, setTo] = useState(new Date());
 	const [marketing, setMarketing] = useState('');
@@ -33,53 +34,88 @@ export default function index() {
 	const [party, setParty] = useState('');
 	const [order, setOrder] = useState('');
 	const [reportFor, setReportFor] = useState('');
-	// const { data, isLoading } = useProductionStatementReport(
-	// 	format(from, 'yyyy-MM-dd'),
-	// 	format(to, 'yyyy-MM-dd'),
-	// 	party,
-	// 	marketing,
-	// 	type,
-	// 	order,
-	// 	reportFor,
-	// 	priceFor,
-	// 	getPath(haveAccess, user?.uuid),
-	// 	{
-	// 		isEnabled: !!user?.uuid,
-	// 	}
-	// );
 
-	const handlePdf = async (btnType) => {
-		setIsLoading(true);
-		try {
-			const path = getPath(haveAccess, user?.uuid);
+	let worker = useRef(null);
+	const { data, isLoading } = useProductionStatementReport(
+		format(from, 'yyyy-MM-dd'),
+		format(to, 'yyyy-MM-dd'),
+		party,
+		marketing,
+		type,
+		order,
+		reportFor,
+		priceFor,
+		getPath(haveAccess, user?.uuid),
+		{
+			isEnabled: !!user?.uuid,
+		}
+	);
 
-			const response = await api.get(
-				`/report/delivery-statement-report?from_date=${format(from, 'yyyy-MM-dd')}&to_date=${format(to, 'yyyy-MM-dd')}&party=${party}&marketing=${marketing}&order_info_uuid=${order}&type=${type}&report_for=${reportFor}&price_for=${priceFor}&${path}`
-			);
+	useEffect(() => {
+		worker.current = new PdfWorker();
 
-			const data = response?.data?.data || [];
+		// Listen for messages from the worker
+		worker.current.onmessage = (event) => {
+			const { type, blob, error: workerError } = event.data;
 
-			if (btnType == 'pdf') {
-				const pdf = Pdf(data, from, to); // should return pdfDoc from pdfmake.createPdf()
+			if (type === 'pdfGenerated') {
+				const url = URL.createObjectURL(blob);
+				setPdfUrl(url);
+				setIsGenerating(false);
+				setError(null);
+			} else if (type === 'pdfError') {
+				console.error('PDF generation failed in worker:', workerError);
+				setError(`PDF generation failed: ${workerError}`);
+				setIsGenerating(false);
+			}
+		};
 
-				// Wait for PDF to be ready before opening
-				pdf.getBlob((blob) => {
-					const url = URL.createObjectURL(blob);
-					window.open(url); // or use a new tab/window
+		// Handle errors that might occur in the worker itself (e.g., script loading errors)
+		worker.current.onerror = (e) => {
+			console.error('Web Worker error:', e);
+			setError('An error occurred with the PDF generator.');
+			setIsGenerating(false);
+		};
+
+		// Clean up the worker when the component unmounts
+		return () => {
+			if (worker.current) {
+				worker.current.terminate();
+				worker.current = null;
+			}
+			if (pdfUrl) {
+				URL.revokeObjectURL(pdfUrl); // Clean up any lingering object URL
+			}
+		};
+	}, []);
+	const pdfDocGenerator = Pdf(data, from, to);
+
+	const generate = (btnType) => {
+		if (btnType == 'excel' && !isLoading) {
+			Excel(data, from, to);
+		} else {
+			setIsGenerating(true);
+			setPdfUrl(null); // Clear previous PDF
+			setError(null);
+
+			// Your pdfmake document definition (example)
+			const docDefinition = pdfDocGenerator;
+
+			// Send the document definition and any options to the worker
+			if (worker.current) {
+				worker.current.postMessage({
+					type: 'generatePdf',
+					data: {
+						documentDefinition: docDefinition,
+						options: {}, // Add any pdfmake options here
+					},
 				});
 			} else {
-				Excel(data, from, to, priceFor);
+				setError('PDF worker not initialized.');
+				setIsGenerating(false);
 			}
-		} catch (error) {
-			console.error('Failed to generate PDF:', error);
-		} finally {
-			setIsLoading(false);
 		}
 	};
-
-	// if (isLoading)
-	// 	return <span className='loading loading-dots loading-lg z-50' />;
-
 	return (
 		<div className='flex flex-col gap-8'>
 			<Header
@@ -103,19 +139,35 @@ export default function index() {
 					isLoading,
 				}}
 			/>
-			<div className='flex gap-2'>
+			<div className='grid grid-cols-1 gap-2 md:grid-cols-2'>
+				<div className='flex gap-2'>
+					<button
+						type='button'
+						onClick={() => generate('pdf')}
+						className='btn btn-primary flex-1'
+						disabled={isGenerating}
+					>
+						{isGenerating && (
+							<LoaderCircle className='animate-spin' />
+						)}
+						{pdfUrl ? 'Regenerate PDF' : 'Generate PDF'}
+					</button>
+					{error && <p style={{ color: 'red' }}>{error}</p>}
+					{pdfUrl && (
+						<>
+							<a
+								className='btn btn-primary flex-1'
+								href={pdfUrl}
+								download='erp_report.pdf'
+							>
+								Download Now
+							</a>
+						</>
+					)}
+				</div>
 				<button
 					type='button'
-					onClick={() => handlePdf('pdf')}
-					className='btn btn-primary flex-1'
-					disabled={isLoading}
-				>
-					{isLoading && <LoaderCircle className='animate-spin' />}
-					PDF
-				</button>
-				<button
-					type='button'
-					onClick={() => handlePdf('excel')}
+					onClick={() => generate('excel')}
 					className='btn btn-secondary flex-1'
 					disabled={isLoading}
 				>
