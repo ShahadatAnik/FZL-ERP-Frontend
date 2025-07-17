@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/context/auth';
 import {
 	useOtherOrderPropertiesByGarmentsWash,
@@ -10,12 +10,27 @@ import { LoaderCircle } from 'lucide-react';
 import { useAccess } from '@/hooks';
 
 import OrderSheetPdf from '@/components/Pdf/OrderStatement';
+import PdfWorker from '@/components/Pdf/pdfWorker.js?worker'; // Vite example (or similar for Webpack)
 
 import { api } from '@lib/api';
 
 import Excel from './Excel';
 import Header from './Header';
 
+function removeFunctions(obj) {
+	if (Array.isArray(obj)) {
+		return obj.map(removeFunctions);
+	} else if (obj && typeof obj === 'object') {
+		const newObj = {};
+		for (const key in obj) {
+			if (typeof obj[key] !== 'function') {
+				newObj[key] = removeFunctions(obj[key]);
+			}
+		}
+		return newObj;
+	}
+	return obj;
+}
 const getPath = (haveAccess, userUUID) => {
 	if (haveAccess.includes('show_own_orders') && userUUID) {
 		return `own_uuid=${userUUID}`;
@@ -27,7 +42,11 @@ const getPath = (haveAccess, userUUID) => {
 export default function index() {
 	const haveAccess = useAccess('report__production_statement');
 	const { user } = useAuth();
-	const [isLoading, setIsLoading] = useState(false);
+
+	let worker = useRef(null);
+	const [isGenerating, setIsGenerating] = useState(false);
+	const [pdfUrl, setPdfUrl] = useState(null);
+	const [error, setError] = useState(null);
 
 	const [from, setFrom] = useState(format(new Date(), 'yyyy-MM-dd'));
 	const [to, setTo] = useState(format(new Date(), 'yyyy-MM-dd'));
@@ -36,56 +55,83 @@ export default function index() {
 	const [party, setParty] = useState('');
 	const { data: garments } = useOtherOrderPropertiesByGarmentsWash();
 	const { data: sr } = useOtherOrderPropertiesBySpecialRequirement();
-	// const { data, isLoading } = useOrderStatementReport(
-	// 	from,
-	// 	to,
-	// 	party,
-	// 	marketing,
-	// 	type,
-	// 	getPath(haveAccess, user?.uuid),
-	// 	{
-	// 		isEnabled: !!user?.uuid && get,
-	// 	}
-	// );
+	const { data, isLoading } = useOrderStatementReport(
+		from,
+		to,
+		party,
+		marketing,
+		type,
+		getPath(haveAccess, user?.uuid),
+		{
+			isEnabled: !!user?.uuid,
+		}
+	);
 
-	// useEffect(() => {
-	// 	if (get && data && !isLoading) {
-	// 		OrderSheetPdf(data, garments, sr, from, to)?.open();
-	// 		setGet(false);
-	// 	}
-	// }, [get, data, isLoading]);
+	useEffect(() => {
+		worker.current = new PdfWorker();
 
-	const handlePdf = async (btnType) => {
-		setIsLoading(true);
-		try {
-			const path = getPath(haveAccess, user?.uuid);
+		// Listen for messages from the worker
+		worker.current.onmessage = (event) => {
+			const { type, blob, error: workerError } = event.data;
 
-			const response = await api.get(
-				`/report/order-sheet-pdf-report?from_date=${from}&to_date=${to}&party=${party}&marketing=${marketing}&type=${type}&${path}`
-			);
+			if (type === 'pdfGenerated') {
+				const url = URL.createObjectURL(blob);
+				setPdfUrl(url);
+				setIsGenerating(false);
+				setError(null);
+			} else if (type === 'pdfError') {
+				console.error('PDF generation failed in worker:', workerError);
+				setError(`PDF generation failed: ${workerError}`);
+				setIsGenerating(false);
+			}
+		};
 
-			const data = response?.data?.data || [];
+		// Handle errors that might occur in the worker itself (e.g., script loading errors)
+		worker.current.onerror = (e) => {
+			console.error('Web Worker error:', e);
+			setError('An error occurred with the PDF generator.');
+			setIsGenerating(false);
+		};
 
-			if (btnType == 'pdf') {
-				const pdf = OrderSheetPdf(data, garments, sr, from, to); // should return pdfDoc from pdfmake.createPdf()
+		// Clean up the worker when the component unmounts
+		return () => {
+			if (worker.current) {
+				worker.current.terminate();
+				worker.current = null;
+			}
+			if (pdfUrl) {
+				URL.revokeObjectURL(pdfUrl); // Clean up any lingering object URL
+			}
+		};
+	}, []);
+	const pdfDocGenerator = OrderSheetPdf(data, garments, sr, from, to);
 
-				// Wait for PDF to be ready before opening
-				pdf.getBlob((blob) => {
-					const url = URL.createObjectURL(blob);
-					window.open(url); // or use a new tab/window
+	const generate = (btnType) => {
+		if (btnType == 'excel' && !isLoading) {
+			Excel(data, from, to);
+		} else {
+			setIsGenerating(true);
+			setPdfUrl(null); // Clear previous PDF
+			setError(null);
+
+			// Your pdfmake document definition (example)
+			const docDefinition = removeFunctions(pdfDocGenerator);
+
+			// Send the document definition and any options to the worker
+			if (worker.current) {
+				worker.current.postMessage({
+					type: 'generatePdf',
+					data: {
+						documentDefinition: docDefinition,
+						options: {}, // Add any pdfmake options here
+					},
 				});
 			} else {
-				Excel(data, from, to);
+				setError('PDF worker not initialized.');
+				setIsGenerating(false);
 			}
-		} catch (error) {
-			console.error('Failed to generate PDF:', error);
-		} finally {
-			setIsLoading(false);
 		}
 	};
-
-	// if (isLoading)
-	// 	return <span className='loading loading-dots loading-lg z-50' />;
 
 	return (
 		<div className='flex flex-col gap-8'>
@@ -105,17 +151,31 @@ export default function index() {
 				}}
 			/>
 			<div className='flex gap-2'>
-				<button
-					type='button'
-					onClick={() => {
-						handlePdf('pdf');
-					}}
-					className='btn btn-primary flex-1'
-					disabled={isLoading}
-				>
-					{isLoading && <LoaderCircle className='animate-spin' />}
-					PDF
-				</button>
+				<div className='flex gap-2'>
+					<button
+						type='button'
+						onClick={() => generate('pdf')}
+						className='btn btn-primary flex-1'
+						disabled={isGenerating || isLoading}
+					>
+						{isGenerating && (
+							<LoaderCircle className='animate-spin' />
+						)}
+						{pdfUrl ? 'Regenerate PDF' : 'Generate PDF'}
+					</button>
+					{error && <p style={{ color: 'red' }}>{error}</p>}
+					{pdfUrl && (
+						<>
+							<a
+								className='btn btn-primary flex-1'
+								href={pdfUrl}
+								download='erp_report.pdf'
+							>
+								Download Now
+							</a>
+						</>
+					)}
+				</div>
 				{/* <button
 					type='button'
 					onClick={() => Excel(data, from, to)}

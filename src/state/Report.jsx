@@ -30,7 +30,8 @@ export const useProductionReportDateWise = (
 		url:
 			`/report/daily-production-report?from_date=${from}&to_date=${to}&type=${type}` +
 			query,
-		enabled: !!from && !!to && enabled,
+		enabled: false, // never auto-fetch
+		refetchOnWindowFocus: false,
 	});
 export const useProductionStatementReport = (
 	from = '',
