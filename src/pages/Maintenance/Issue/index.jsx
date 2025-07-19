@@ -51,6 +51,11 @@ export default function Index() {
 				),
 			},
 			{
+				accessorKey: 'issue_id',
+				header: 'ID',
+				enableColumnFilter: false,
+			},
+			{
 				accessorKey: 'section',
 				header: 'Section',
 				enableColumnFilter: false,
@@ -116,7 +121,7 @@ export default function Index() {
 						{ value: 'waiting', label: 'Waiting' },
 					];
 					return (
-						<div className='flex flex-col items-center'>
+						<div>
 							<ReactSelect
 								className={'w-36'}
 								menuPortalTarget={document.body}
@@ -130,8 +135,8 @@ export default function Index() {
 								}}
 							/>
 
-							<span className='flex text-xs'>
-								{maintain_by_name} -{' '}
+							<span className='flex flex-col text-xs'>
+								{maintain_by_name}
 								<DateTime date={maintain_date} isTime={false} />
 							</span>
 						</div>
@@ -157,8 +162,8 @@ export default function Index() {
 								}}
 								checked={info.getValue() === true}
 							/>
-							<span className='flex text-xs'>
-								{verification_by_name} -{' '}
+							<span className='flex flex-col text-xs'>
+								{verification_by_name}
 								<DateTime
 									date={verification_date}
 									isTime={false}

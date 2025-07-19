@@ -607,3 +607,9 @@ export const useOtherSectionMachine = () =>
 		queryKey: otherQK.sectionMachine(),
 		url: '/other/maintain/section-machine/value/label',
 	});
+
+export const useOtherIssue = () =>
+	createGlobalState({
+		queryKey: otherQK.otherIssue(),
+		url: '/other/maintain/issue/value/label',
+	});

@@ -52,6 +52,12 @@ export default function Index() {
 				cell: (info) => info.getValue(),
 			},
 			{
+				accessorKey: 'issue_id',
+				header: 'Issue ID',
+				enableColumnFilter: false,
+				cell: (info) => info.getValue(),
+			},
+			{
 				accessorKey: 'order_number',
 				header: 'O/N',
 				enableColumnFilter: true,

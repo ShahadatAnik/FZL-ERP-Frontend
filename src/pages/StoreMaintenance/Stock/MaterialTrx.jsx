@@ -10,6 +10,8 @@ import { MATERIAL_STOCK_NULL, MATERIAL_STOCK_SCHEMA } from '@util/Schema';
 import GetDateTime from '@/util/GetDateTime';
 import getTransactionArea from '@/util/TransactionArea';
 
+import { sections } from './Utils';
+
 export default function Index({
 	modalId = '',
 	// eslint-disable-next-line @eslint-react/no-unstable-default-props
@@ -90,8 +92,8 @@ export default function Index({
 						return (
 							<ReactSelect
 								placeholder='Select Transaction Area'
-								options={transactionArea}
-								value={transactionArea?.filter(
+								options={sections}
+								value={sections?.filter(
 									(item) => item.value === getValues('trx_to')
 								)}
 								onChange={(e) => {

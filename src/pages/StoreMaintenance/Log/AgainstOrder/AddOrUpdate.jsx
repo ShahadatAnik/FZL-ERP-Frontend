@@ -42,6 +42,8 @@ import {
 import GetDateTime from '@/util/GetDateTime';
 import getTransactionArea, { getPurposes } from '@/util/TransactionArea';
 
+import { sections } from './Utils';
+
 export default function Index({
 	modalId = '',
 	updateMaterialTrxToOrder = {
@@ -185,7 +187,7 @@ export default function Index({
 			onClose={onClose}
 			isSmall={true}
 		>
-			<FormField label='purpose' title='Purpose' errors={errors}>
+			{/* <FormField label='purpose' title='Purpose' errors={errors}>
 				<Controller
 					name={'purpose'}
 					control={control}
@@ -206,7 +208,7 @@ export default function Index({
 						);
 					}}
 				/>
-			</FormField>
+			</FormField> */}
 			<FormField label='trx_to' title='Trx to' errors={errors}>
 				<Controller
 					name={'trx_to'}
@@ -215,8 +217,8 @@ export default function Index({
 						return (
 							<ReactSelect
 								placeholder='Select Transaction Area'
-								options={transactionArea}
-								value={transactionArea?.filter(
+								options={sections}
+								value={sections?.filter(
 									(item) => item.value == getValues('trx_to')
 								)}
 								onChange={(e) => onChange(e.value)}

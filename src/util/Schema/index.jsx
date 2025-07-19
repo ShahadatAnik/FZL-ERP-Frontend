@@ -256,6 +256,22 @@ export const MATERIAL_TRX_AGAINST_ORDER_NULL = {
 	remarks: '',
 };
 
+export const MATERIAL_TRX_AGAINST_ISSUE_SCHEMA = {
+	issue_uuid: STRING_REQUIRED,
+	trx_to: STRING_REQUIRED,
+	trx_quantity: NUMBER_DOUBLE_REQUIRED,
+	weight: NUMBER_DOUBLE.default(0),
+	remarks: STRING.nullable(),
+};
+
+export const MATERIAL_TRX_AGAINST_ISSUE_NULL = {
+	issue_uuid: null,
+	trx_to: '',
+	trx_quantity: '',
+	weight: 0,
+	remarks: '',
+};
+
 export const MATERIAL_BOOKING_SCHEMA = {
 	marketing_uuid: STRING_REQUIRED,
 	quantity: NUMBER_DOUBLE_REQUIRED.moreThan(0, 'More than 0'),

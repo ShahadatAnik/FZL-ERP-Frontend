@@ -12,7 +12,7 @@ import {
 	useOrderAgainstMetalTMRMLog,
 } from '@/state/Metal';
 import { useOrderAgainstNylonMetallicFinishingRMLog } from '@/state/Nylon';
-import { useOtherOrderStore } from '@/state/Other';
+import { useOtherIssue, useOtherOrderStore } from '@/state/Other';
 import {
 	useOrderAgainstDieCastingRMLog,
 	useOrderAgainstSliderAssemblyRMLog,
@@ -32,12 +32,14 @@ import { FormField, Input, ReactSelect } from '@/ui';
 import nanoid from '@/lib/nanoid';
 import { DevTool } from '@/lib/react-hook-devtool';
 import {
-	MATERIAL_TRX_AGAINST_ORDER_NULL,
-	MATERIAL_TRX_AGAINST_ORDER_SCHEMA,
+	MATERIAL_TRX_AGAINST_ISSUE_NULL,
+	MATERIAL_TRX_AGAINST_ISSUE_SCHEMA,
 	NUMBER_DOUBLE_REQUIRED,
 } from '@util/Schema';
 import GetDateTime from '@/util/GetDateTime';
 import getTransactionArea, { getPurposes } from '@/util/TransactionArea';
+
+import { sections } from './Utils';
 
 export default function Index({
 	modalId = '',
@@ -49,6 +51,7 @@ export default function Index({
 	setUpdateMaterialDetails,
 }) {
 	const { postData } = useMaterialInfo();
+	const { data: issues } = useOtherIssue();
 	const { invalidateQuery: invalidateMaterialStockToSFG } =
 		useMaterialStockToSFG();
 	const { invalidateQuery: invalidateMaterialInfo } = useMaterialInfo('rm');
@@ -86,13 +89,11 @@ export default function Index({
 	const { user } = useAuth();
 
 	const schema = {
-		...MATERIAL_TRX_AGAINST_ORDER_SCHEMA,
-		trx_quantity: MATERIAL_TRX_AGAINST_ORDER_SCHEMA.trx_quantity
+		...MATERIAL_TRX_AGAINST_ISSUE_SCHEMA,
+		trx_quantity: MATERIAL_TRX_AGAINST_ISSUE_SCHEMA.trx_quantity
 			.moreThan(0)
 			.max(Number(updateMaterialDetails?.stock).toFixed(3)),
-		weight: MATERIAL_TRX_AGAINST_ORDER_SCHEMA.weight.required('required'),
 	};
-	const { data: order } = useOtherOrderStore();
 
 	const {
 		register,
@@ -103,7 +104,7 @@ export default function Index({
 		reset,
 		getValues,
 		context,
-	} = useRHF(schema, MATERIAL_TRX_AGAINST_ORDER_NULL);
+	} = useRHF(schema, MATERIAL_TRX_AGAINST_ISSUE_NULL);
 
 	const onClose = () => {
 		setUpdateMaterialDetails((prev) => ({
@@ -111,7 +112,7 @@ export default function Index({
 			uuid: null,
 			stock: 0,
 		}));
-		reset(MATERIAL_TRX_AGAINST_ORDER_NULL);
+		reset(MATERIAL_TRX_AGAINST_ISSUE_NULL);
 		window[modalId].close();
 	};
 
@@ -127,7 +128,7 @@ export default function Index({
 			};
 
 			await postData.mutateAsync({
-				url: '/zipper/material-trx-against-order',
+				url: '/zipper/material-trx-against-issue',
 				newData: updatedData,
 				onClose,
 			});
@@ -159,52 +160,26 @@ export default function Index({
 	return (
 		<AddModal
 			id={modalId}
-			title={'Material Trx Against Order: ' + updateMaterialDetails?.name}
+			title={'Material Trx Against Issue: ' + updateMaterialDetails?.name}
 			formContext={context}
 			onSubmit={handleSubmit(onSubmit)}
 			onClose={onClose}
 			isSmall={true}
 		>
-			<FormField label='purpose' title='Purpose' errors={errors}>
+			<FormField label='issue_uuid' title='Issue' errors={errors}>
 				<Controller
-					name={'purpose'}
+					name={'issue_uuid'}
 					control={control}
 					render={({ field: { onChange } }) => {
 						return (
 							<ReactSelect
-								placeholder='Select purpose'
-								options={purposes}
+								placeholder='Select Issue'
+								options={issues}
 								value={
-									purposes?.filter(
-										(item) =>
-											item.value === getValues('purpose')
-									) || null
-								}
-								onChange={(e) => onChange(e.value)}
-							/>
-						);
-					}}
-				/>
-			</FormField>
-
-			<FormField
-				label='order_description_uuid'
-				title='Order'
-				errors={errors}
-			>
-				<Controller
-					name={'order_description_uuid'}
-					control={control}
-					render={({ field: { onChange } }) => {
-						return (
-							<ReactSelect
-								placeholder='Select Order'
-								options={order}
-								value={
-									order?.filter(
+									issues?.filter(
 										(item) =>
 											item.value ===
-											getValues('order_description_uuid')
+											getValues('issue_uuid')
 									) || null
 								}
 								onChange={(e) => onChange(e.value)}
@@ -222,9 +197,9 @@ export default function Index({
 						return (
 							<ReactSelect
 								placeholder='Select Transaction Section'
-								options={getTransactionArea()}
+								options={sections}
 								value={
-									getTransactionArea().filter(
+									sections.filter(
 										(item) =>
 											item.value === getValues('trx_to')
 									) || null

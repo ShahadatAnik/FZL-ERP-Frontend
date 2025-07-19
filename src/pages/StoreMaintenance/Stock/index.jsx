@@ -101,8 +101,8 @@ export default function Index() {
 				// 	),
 			},
 			{
-				accessorKey: 'action_trx_against_order',
-				header: 'Trx Against Order',
+				accessorKey: 'action_trx_against_issue',
+				header: 'Trx Against Issue',
 				enableColumnFilter: false,
 				enableSorting: false,
 				hidden: !haveAccess.includes('click_trx_against_order'),
@@ -122,17 +122,17 @@ export default function Index() {
 					/>
 				),
 			},
-			{
-				accessorKey: 'action_booking',
-				header: 'Booking',
-				enableColumnFilter: false,
-				enableSorting: false,
-				hidden: !haveAccess.includes('click_booking'),
-				width: 'w-32',
-				cell: (info) => (
-					<Transfer onClick={() => handleBooking(info.row.index)} />
-				),
-			},
+			// {
+			// 	accessorKey: 'action_booking',
+			// 	header: 'Booking',
+			// 	enableColumnFilter: false,
+			// 	enableSorting: false,
+			// 	hidden: !haveAccess.includes('click_booking'),
+			// 	width: 'w-32',
+			// 	cell: (info) => (
+			// 		<Transfer onClick={() => handleBooking(info.row.index)} />
+			// 	),
+			// },
 			{
 				accessorKey: 'section_name',
 				header: 'Section',
