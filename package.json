@@ -54,6 +54,7 @@
 		"react-spreadsheet": "^0.9.5",
 		"react-toastify": "^11.0.5",
 		"recharts": "^2.15.1",
+		"socket.io-client": "^4.8.1",
 		"tailwind-merge": "^2.6.0",
 		"tailwindcss-animate": "^1.0.7",
 		"to-words": "^4.2.0",

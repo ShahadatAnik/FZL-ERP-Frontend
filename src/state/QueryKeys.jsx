@@ -1653,6 +1653,8 @@ export const otherQK = {
 
 	sectionMachine: () => [...otherQK.all(), 'section-machine'],
 	otherIssue: () => [...otherQK.all(), 'other-issue'],
+
+	subscribe: () => [...otherQK.all(), 'subscribe'],
 };
 
 //* Challan

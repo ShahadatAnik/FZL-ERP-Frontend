@@ -613,3 +613,10 @@ export const useOtherIssue = () =>
 		queryKey: otherQK.otherIssue(),
 		url: '/other/maintain/issue/value/label',
 	});
+
+
+export const useSubscribe = () =>
+	createGlobalState({
+		queryKey: otherQK.subscribe(),
+		url: '/public/subscribe',
+	});

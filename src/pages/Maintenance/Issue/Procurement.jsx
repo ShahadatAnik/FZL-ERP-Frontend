@@ -94,7 +94,7 @@ export default function Index({
 		invalidateQuery();
 		return;
 	};
-	console.log(procurement);
+
 	return (
 		<AddModal
 			id={modalId}
