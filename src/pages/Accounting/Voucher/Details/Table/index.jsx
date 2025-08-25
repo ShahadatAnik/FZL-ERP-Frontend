@@ -163,12 +163,6 @@ const VoucherDetailsTable = ({ data }) => {
 								<th className='border-r border-gray-300 px-4 py-3 text-left text-sm font-medium text-gray-700'>
 									Ledger
 								</th>
-								<th className='w-48 border-r border-gray-300 px-3 py-3 text-left text-sm font-medium text-gray-700'>
-									Transaction No.
-								</th>
-								<th className='w-32 border-r border-gray-300 px-3 py-3 text-left text-sm font-medium text-gray-700'>
-									Date
-								</th>
 								<th className='w-28 border-r border-gray-300 px-4 py-3 text-right text-sm font-medium text-gray-700'>
 									Debit ({data?.currency_symbol})
 								</th>
@@ -178,132 +172,135 @@ const VoucherDetailsTable = ({ data }) => {
 							</tr>
 						</thead>
 						<tbody>
-							{tableRows.map((row, index) => (
-								<tr
-									key={`${row.entryIndex}-${index}`}
-									className={`border-t border-gray-300 ${
-										row.type === 'main'
-											? 'hover:bg-gray-50'
-											: 'bg-gray-50 italic'
-									}`}
-								>
-									{/* Index column with rowSpan for main entries */}
-									{row.isFirst && (
+							{tableRows.map((row, index) => {
+								// Determine background color based on entryIndex (entry group)
+								const isEvenEntry = row.entryIndex % 2 === 0;
+								const rowBackgroundClass = isEvenEntry
+									? 'bg-white hover:bg-gray-50'
+									: 'bg-gray-50 hover:bg-gray-100';
+
+								return (
+									<tr
+										key={`${row.entryIndex}-${index}`}
+										className={`border-t border-gray-300 ${rowBackgroundClass} ${
+											row.type !== 'main' ? 'italic' : ''
+										}`}
+									>
+										{/* Index column with rowSpan for main entries */}
+										{row.isFirst && (
+											<td
+												className='border-r border-gray-300 px-3 py-3 text-center align-top text-sm text-gray-800'
+												rowSpan={row.rowSpan}
+											>
+												{row.data.index || 'N/A'}
+											</td>
+										)}
+
+										{/* Ledger Name */}
 										<td
-											className='border-r border-gray-300 px-3 py-3 text-center align-top text-sm text-gray-800'
-											rowSpan={row.rowSpan}
+											className={`border-r border-gray-300 px-4 py-3 text-sm ${
+												row.type === 'main'
+													? 'font-medium text-gray-800'
+													: 'pl-8 text-gray-600'
+											}`}
 										>
-											{row.data.index || 'N/A'}
+											{row.type === 'main' ? (
+												row.data.ledgerName || 'N/A'
+											) : row.type === 'cost_center' ? (
+												<div className='flex items-center gap-2'>
+													{row.entryIndex + 1}.
+													{row.data.index}
+													<span className='flex-1'>
+														{row.data.name}
+													</span>
+												</div>
+											) : (
+												<div className='flex items-center gap-2'>
+													{row.entryIndex + 1}.
+													{row.data.index}
+													<span className='flex-1 font-medium'>
+														{
+															paymentTypeOption.find(
+																(option) =>
+																	option.value ===
+																	row.data
+																		.paymentType
+															).label
+														}
+														:{' '}
+														{row.data
+															.transactionNo ||
+															''}{' '}
+														{(row.data.date &&
+															'(' +
+																row.data.date +
+																')') ||
+															''}
+													</span>
+												</div>
+											)}
 										</td>
-									)}
 
-									{/* Ledger Name */}
-									<td
-										className={`border-r border-gray-300 px-4 py-3 text-sm ${
-											row.type === 'main'
-												? 'font-medium text-gray-800'
-												: 'pl-8 text-gray-600'
-										}`}
-									>
-										{row.type === 'main' ? (
-											row.data.ledgerName || 'N/A'
-										) : row.type === 'cost_center' ? (
-											<div className='flex items-center gap-2'>
-												{row.entryIndex + 1}.
-												{row.data.index}
-												<span className='flex-1'>
-													{row.data.name}
+										{/* Debit column */}
+										<td
+											className={`border-r border-gray-300 px-4 py-3 text-right text-sm ${
+												row.type === 'main'
+													? 'font-medium text-gray-800'
+													: 'text-gray-600'
+											}`}
+										>
+											{row.data.debit && (
+												<span>
+													{typeof row.data.debit ===
+													'number'
+														? formatAmountSmart(
+																row.data.debit.toFixed(
+																	2
+																),
+																data?.currency_symbol
+															)
+														: formatAmountSmart(
+																row.data.debit,
+																data?.currency_symbol
+															)}
 												</span>
-											</div>
-										) : (
-											<div className='flex items-center gap-2'>
-												{row.entryIndex + 1}.
-												{row.data.index}
-												<span className='flex-1 font-medium'>
-													{
-														paymentTypeOption.find(
-															(option) =>
-																option.value ===
-																row.data
-																	.paymentType
-														).label
-													}
+											)}
+										</td>
+
+										{/* Credit column */}
+										<td
+											className={`px-4 py-3 text-right text-sm ${
+												row.type === 'main'
+													? 'font-medium text-gray-800'
+													: 'text-gray-600'
+											}`}
+										>
+											{row.data.credit && (
+												<span>
+													{typeof row.data.credit ===
+													'number'
+														? formatAmountSmart(
+																row.data.credit.toFixed(
+																	2
+																),
+																data?.currency_symbol
+															)
+														: formatAmountSmart(
+																row.data.credit,
+																data?.currency_symbol
+															)}
 												</span>
-											</div>
-										)}
-									</td>
-
-									{/* Transaction Number column */}
-									<td className='border-r border-gray-300 px-3 py-3 text-sm text-gray-600'>
-										{row.data.transactionNo || '--'}
-									</td>
-
-									{/* Date column */}
-									<td className='border-r border-gray-300 px-3 py-3 text-sm text-gray-600'>
-										{row.data.date || '--'}
-									</td>
-
-									{/* Debit column */}
-									<td
-										className={`border-r border-gray-300 px-4 py-3 text-right text-sm ${
-											row.type === 'main'
-												? 'font-medium text-gray-800'
-												: 'text-gray-600'
-										}`}
-									>
-										{row.data.debit && (
-											<span>
-												{/* {data?.currency_symbol} */}
-												{typeof row.data.debit ===
-												'number'
-													? formatAmountSmart(
-															row.data.debit.toFixed(
-																2
-															),
-															data?.currency_symbol
-														)
-													: formatAmountSmart(
-															row.data.debit,
-															data?.currency_symbol
-														)}
-											</span>
-										)}
-									</td>
-
-									{/* Credit column */}
-									<td
-										className={`px-4 py-3 text-right text-sm ${
-											row.type === 'main'
-												? 'font-medium text-gray-800'
-												: 'text-gray-600'
-										}`}
-									>
-										{row.data.credit && (
-											<span>
-												{/* {data?.currency_symbol} */}
-												{typeof row.data.credit ===
-												'number'
-													? formatAmountSmart(
-															row.data.credit.toFixed(
-																2
-															),
-															data?.currency_symbol
-														)
-													: formatAmountSmart(
-															row.data.credit,
-															data?.currency_symbol
-														)}
-											</span>
-										)}
-									</td>
-								</tr>
-							))}
+											)}
+										</td>
+									</tr>
+								);
+							})}
 						</tbody>
 						<tfoot>
 							<tr className='border-t-2 border-gray-400 bg-gray-100'>
 								<td
 									className='px-4 py-3 font-bold text-gray-700'
-									colSpan={4}
+									colSpan={2}
 								>
 									Narration :{' '}
 									<span className='font-normal text-black'>
@@ -312,7 +309,6 @@ const VoucherDetailsTable = ({ data }) => {
 								</td>
 								<td className='px-2 py-3 text-right font-bold text-gray-800'>
 									<span>
-										{/* {data?.currency_symbol} */}
 										{formatAmountSmart(
 											totals.debit.toFixed(2),
 											data?.currency_symbol
@@ -321,7 +317,6 @@ const VoucherDetailsTable = ({ data }) => {
 								</td>
 								<td className='px-2 py-3 text-right font-bold text-gray-800'>
 									<span>
-										{/* {data?.currency_symbol} */}
 										{formatAmountSmart(
 											totals.credit.toFixed(2),
 											data?.currency_symbol

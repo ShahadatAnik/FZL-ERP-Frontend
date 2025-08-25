@@ -56,13 +56,13 @@ export default function ThreadTable({ pi_cash_entry_thread, conventionRate }) {
 					</div>
 				),
 				enableColumnFilter: false,
-				cell: (info) => info.getValue() * conventionRate,
+				cell: (info) => (info.getValue() * conventionRate).toFixed(2),
 			},
 			{
 				accessorKey: 'value',
 				header: 'Value ($)',
 				enableColumnFilter: false,
-				cell: (info) => info.getValue(),
+				cell: (info) => Number(info.getValue()).toFixed(2),
 			},
 			{
 				accessorKey: 'remarks',

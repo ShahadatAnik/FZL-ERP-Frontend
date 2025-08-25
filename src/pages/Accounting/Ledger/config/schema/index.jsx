@@ -57,7 +57,7 @@ export const LEDGER_SCHEMA = {
 		otherwise: (schema) => schema.nullable(),
 	}),
 	name: STRING_REQUIRED,
-	category: STRING_REQUIRED,
+	// category: STRING_REQUIRED,
 	account_no: STRING.when('is_bank_ledger', {
 		is: (value) => value === true,
 		then: (schema) => schema.required('Required'),
@@ -70,13 +70,15 @@ export const LEDGER_SCHEMA = {
 	vat_deduction: NUMBER_DOUBLE_REQUIRED.default(0),
 	tax_deduction: NUMBER_DOUBLE_REQUIRED.default(0),
 	old_ledger_id: NUMBER.default(0),
+	remarks: STRING.nullable(),
 };
 
 export const LEDGER_NULL = {
+	is_bank_ledger: false,
 	table_name: null,
 	table_uuid: null,
 	name: '',
-	category: '',
+	// category: '',
 	account_no: null,
 	type: 'asset',
 	is_active: true,
@@ -85,4 +87,5 @@ export const LEDGER_NULL = {
 	vat_deduction: 0,
 	tax_deduction: 0,
 	old_ledger_id: 0,
+	remarks: null,
 };

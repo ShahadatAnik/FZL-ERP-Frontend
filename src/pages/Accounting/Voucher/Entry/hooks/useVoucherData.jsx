@@ -13,7 +13,8 @@ export function useVoucherData(uuid) {
 		isLoading: isVoucherLoading,
 	} = useVoucherByUUID(uuid);
 
-	const { data: ledgerOptions = [] } = useOtherAccLedger();
+	const { data: ledgerOptions = [], invalidateQuery: invalidateLedger } =
+		useOtherAccLedger();
 	const { data: currencyOptions, isLoading: isCurrencyLoading } =
 		useOtherCurrency();
 
@@ -36,6 +37,7 @@ export function useVoucherData(uuid) {
 		ledgerOptions,
 		currencyOptions,
 		isCurrencyLoading,
+		invalidateLedger,
 		isUpdate: uuid !== undefined,
 	};
 }

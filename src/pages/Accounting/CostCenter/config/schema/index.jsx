@@ -58,6 +58,7 @@ export const COST_CENTER_SCHEMA = {
 		then: (schema) => schema.required('Required'),
 		otherwise: (schema) => schema.nullable(),
 	}),
+	remarks: STRING.nullable(),
 };
 
 export const COST_CENTER_NULL = {

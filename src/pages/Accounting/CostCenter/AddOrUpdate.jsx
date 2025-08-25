@@ -4,7 +4,7 @@ import { useRHF } from '@/hooks';
 
 import { AddModal } from '@/components/Modal';
 import SwitchToggle from '@/ui/Others/SwitchToggle';
-import { FormField, Input, ReactSelect } from '@/ui';
+import { FormField, Input, ReactSelect, Textarea } from '@/ui';
 
 import nanoid from '@/lib/nanoid';
 import { DevTool } from '@/lib/react-hook-devtool';
@@ -54,7 +54,6 @@ export default function Index({
 			reset(data);
 		}
 	}, [data]);
-	console.log('');
 
 	const onClose = () => {
 		setUpdateItem((prev) => ({
@@ -114,50 +113,62 @@ export default function Index({
 			onClose={onClose}
 			isSmall={true}
 		>
-			<FormField label='table_name' title='Table Name' errors={errors}>
-				<Controller
-					name={'table_name'}
-					control={control}
-					render={({ field: { onChange } }) => {
-						return (
-							<ReactSelect
-								placeholder='Select Table'
-								options={tableOptions}
-								value={tableOptions?.filter(
-									(item) =>
-										item.value == getValues('table_name')
-								)}
-								onChange={(e) => {
-									onChange(e.value);
-									setValue('table_uuid', null);
-								}}
-							/>
-						);
-					}}
-				/>
-			</FormField>
-			<FormField label='table_uuid' title='Table Data' errors={errors}>
-				<Controller
-					name={'table_uuid'}
-					control={control}
-					render={({ field: { onChange } }) => {
-						return (
-							<ReactSelect
-								placeholder='Select Table Data'
-								options={tableDataOptions}
-								value={
-									tableDataOptions?.filter(
+			<div className='flex gap-2'>
+				<FormField
+					label='table_name'
+					title='Table Name'
+					errors={errors}
+				>
+					<Controller
+						name={'table_name'}
+						control={control}
+						render={({ field: { onChange } }) => {
+							return (
+								<ReactSelect
+									placeholder='Select Table'
+									options={tableOptions}
+									value={tableOptions?.filter(
 										(item) =>
 											item.value ==
-											getValues('table_uuid')
-									) || []
-								}
-								onChange={(e) => onChange(e.value)}
-							/>
-						);
-					}}
-				/>
-			</FormField>
+											getValues('table_name')
+									)}
+									onChange={(e) => {
+										onChange(e.value);
+										setValue('table_uuid', null);
+									}}
+								/>
+							);
+						}}
+					/>
+				</FormField>
+
+				<FormField
+					label='table_uuid'
+					title='Table Data'
+					errors={errors}
+				>
+					<Controller
+						name={'table_uuid'}
+						control={control}
+						render={({ field: { onChange } }) => {
+							return (
+								<ReactSelect
+									placeholder='Select Table Data'
+									options={tableDataOptions}
+									value={
+										tableDataOptions?.filter(
+											(item) =>
+												item.value ==
+												getValues('table_uuid')
+										) || []
+									}
+									onChange={(e) => onChange(e.value)}
+								/>
+							);
+						}}
+					/>
+				</FormField>
+			</div>
 			<FormField label='ledger_uuid' title='Ledger' errors={errors}>
 				<Controller
 					name={'ledger_uuid'}
@@ -180,6 +191,7 @@ export default function Index({
 			<Input label='name' {...{ register, errors }} />
 
 			<Input label='invoice_no' {...{ register, errors }} />
+			<Textarea label='remarks' {...{ register, errors }} />
 
 			<DevTool control={control} placement='top-left' />
 		</AddModal>

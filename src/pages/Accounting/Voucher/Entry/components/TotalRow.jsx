@@ -23,7 +23,7 @@ export default function TotalsRow({
 		defaultValue: [],
 	});
 
-	const { totalDr, totalCr, isBalanced, difference } = useMemo(() => {
+	const { totalDr, totalCr, isBalanced } = useMemo(() => {
 		const dr = (entries || [])
 			.filter((entry) => entry.type === 'dr')
 			.reduce((sum, entry) => sum + Number(entry.amount || 0), 0);

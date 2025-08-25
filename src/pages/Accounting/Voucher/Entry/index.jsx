@@ -39,6 +39,7 @@ export default function Index() {
 		invalidateVoucher,
 		isVoucherLoading,
 		ledgerOptions,
+		invalidateLedger,
 		currencyOptions,
 		isCurrencyLoading,
 		isUpdate,
@@ -133,7 +134,9 @@ export default function Index() {
 					watch={watch}
 					setValue={setValue}
 					ledgerOptions={ledgerOptions}
+					invalidateLedger={invalidateLedger}
 					voucherFields={voucherFields}
+					currencyOptions={currencyOptions}
 					{...entryProps}
 					{...nestedEntryProps}
 					setUpdateItem={setUpdateItem}

@@ -132,6 +132,7 @@ export const useVoucherSubmission = ({
 						...cc,
 						index: ccIndex,
 						uuid: nanoid(),
+						voucher_entry_uuid: entry.uuid,
 						created_by: user?.uuid,
 						created_at: GetDateTime(),
 					},
@@ -147,6 +148,7 @@ export const useVoucherSubmission = ({
 					newData: {
 						...p,
 						index: pIndex,
+						voucher_entry_uuid: entry.uuid,
 						created_by: user?.uuid,
 						created_at: GetDateTime(),
 						uuid: nanoid(),
@@ -336,19 +338,19 @@ export const useVoucherSubmission = ({
 			if (hasError) return;
 
 			// Execute create or update flow
-			try {
-				if (isUpdate) {
-					await handleUpdate(data);
-				} else {
-					await handleCreate(data);
-				}
-			} catch (err) {
-				console.error(`Voucher submission error: ${err}`);
-				ShowLocalToast({
-					type: 'error',
-					message: 'An error occurred while processing the voucher',
-				});
+			// try {
+			if (isUpdate) {
+				await handleUpdate(data);
+			} else {
+				await handleCreate(data);
 			}
+			// } catch (err) {
+			// 	console.error(`Voucher submission error: ${err}`);
+			// 	ShowLocalToast({
+			// 		type: 'error',
+			// 		message: 'An error occurred while processing the voucher',
+			// 	});
+			// }
 		},
 		[isUpdate, uuid, reset, VOUCHER_NULLABLE, voucherURL, setError]
 	);

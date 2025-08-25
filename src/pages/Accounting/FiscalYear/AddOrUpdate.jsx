@@ -5,7 +5,7 @@ import { useFetchForRhfReset, useRHF } from '@/hooks';
 
 import { AddModal } from '@/components/Modal';
 import { ShowLocalToast } from '@/components/Toast';
-import { CheckBox, DateInput, Switch } from '@/ui/Core';
+import { CheckBox, DateInput, Switch, Textarea } from '@/ui/Core';
 import { FormField, Input, ReactSelect } from '@/ui';
 
 import nanoid from '@/lib/nanoid';
@@ -239,6 +239,7 @@ export default function Index({
 						{...{ register, errors }}
 					/>
 				</div>
+				<Textarea label='remarks' {...{ register, errors }} />
 				<br />
 				<p className='w-full rounded-sm border bg-secondary/5 text-center font-semibold text-primary'>
 					Budget

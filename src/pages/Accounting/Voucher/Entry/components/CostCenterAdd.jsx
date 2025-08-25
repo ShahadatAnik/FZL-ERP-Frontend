@@ -35,7 +35,6 @@ export default function Index({
 
 	const { data } = useAccCostCenterByUUID(updateItem?.uuid);
 	const { invalidateQuery } = useAccCostCenter();
-	const { data: ledgerOptions } = useOtherAccLedger();
 	const { data: tableOptions } = useOtherTableName();
 	const schema = { ...COST_CENTER_SCHEMA, ledger_uuid: STRING.nullable() };
 
@@ -88,13 +87,19 @@ export default function Index({
 
 		await invalidateQuery();
 		await updateItem?.invalidQueryCostCenter();
+		await updateItem?.invalidateLedger();
 		updateItem?.voucher_entry_set_value(
 			`voucher_entry[${updateItem.index}].voucher_entry_cost_center`,
 			[
-				...updateItem.currentCostCenters,
+				...updateItem.currentCostCenters.filter(
+					(item) =>
+						item.cost_center_uuid !== null &&
+						item.cost_center_uuid !== undefined &&
+						item.cost_center_uuid !== ''
+				),
 				{
 					cost_center_uuid: new_uuid,
-					amount: 0,
+					amount: updateItem?.amount || 0,
 				},
 			]
 		);

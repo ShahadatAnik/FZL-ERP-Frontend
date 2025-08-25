@@ -57,13 +57,13 @@ export default function ThreadTable({ pi_cash_entry_thread }) {
 					</div>
 				),
 				enableColumnFilter: false,
-				cell: (info) => info.getValue(),
+				cell: (info) => info.getValue().toFixed(2),
 			},
 			{
 				accessorKey: 'value',
 				header: 'Value ($)',
 				enableColumnFilter: false,
-				cell: (info) => info.getValue(),
+				cell: (info) => info.getValue().toFixed(2),
 			},
 			{
 				accessorKey: 'remarks',

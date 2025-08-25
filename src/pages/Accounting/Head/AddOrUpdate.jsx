@@ -4,7 +4,7 @@ import { useRHF } from '@/hooks';
 
 import { AddModal } from '@/components/Modal';
 import SwitchToggle from '@/ui/Others/SwitchToggle';
-import { FormField, Input } from '@/ui';
+import { FormField, Input, Textarea } from '@/ui';
 
 import nanoid from '@/lib/nanoid';
 import { DevTool } from '@/lib/react-hook-devtool';
@@ -134,7 +134,7 @@ export default function Index({
 					/>
 				</FormField>
 			</div>
-
+			<Textarea label='remarks' {...{ register, errors }} />
 			<DevTool control={control} placement='top-left' />
 		</AddModal>
 	);

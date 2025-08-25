@@ -53,6 +53,7 @@ export const HEAD_SCHEMA = {
 	title: STRING_REQUIRED,
 	bs: BOOLEAN_DEFAULT_VALUE(false),
 	is_fixed: BOOLEAN_DEFAULT_VALUE(true),
+	remarks: STRING.nullable(),
 };
 
 export const HEAD_NULL = {
@@ -60,4 +61,5 @@ export const HEAD_NULL = {
 	title: '',
 	bs: false,
 	is_fixed: true,
+	remarks: null,
 };

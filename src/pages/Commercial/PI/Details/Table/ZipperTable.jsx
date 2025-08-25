@@ -100,13 +100,13 @@ export default function ZipperTable({ pi }) {
 					</div>
 				),
 				enableColumnFilter: false,
-				cell: (info) => info.getValue(),
+				cell: (info) => info.getValue().toFixed(2),
 			},
 			{
 				accessorKey: 'value',
 				header: 'Value ($)',
 				enableColumnFilter: false,
-				cell: (info) => Number(info.getValue()).toFixed(3),
+				cell: (info) => Number(info.getValue()).toFixed(2),
 			},
 			{
 				accessorKey: 'remarks',

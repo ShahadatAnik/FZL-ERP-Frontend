@@ -53,6 +53,7 @@ export const GROUP_SCHEMA = {
 	head_uuid: STRING_REQUIRED,
 	code: STRING_REQUIRED,
 	is_fixed: BOOLEAN_DEFAULT_VALUE(true),
+	remarks: STRING.nullable(),
 };
 
 export const GROUP_NULL = {
@@ -60,4 +61,5 @@ export const GROUP_NULL = {
 	head_uuid: '',
 	code: '',
 	is_fixed: true,
+	remarks: null,
 };

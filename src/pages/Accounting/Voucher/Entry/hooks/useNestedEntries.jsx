@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 export function useVoucherNestedEntries({ watch, setValue, setDeleteItem }) {
 	// Payment handlers
 	const handlePaymentAppend = useCallback(
-		(voucherIndex) => {
+		(voucherIndex, amount) => {
 			const currentPayments =
 				watch(`voucher_entry[${voucherIndex}].voucher_entry_payment`) ||
 				[];
@@ -13,7 +13,7 @@ export function useVoucherNestedEntries({ watch, setValue, setDeleteItem }) {
 					payment_type: '',
 					trx_no: '',
 					date: null,
-					amount: '',
+					amount: amount || 0,
 				},
 			]);
 		},
@@ -44,7 +44,7 @@ export function useVoucherNestedEntries({ watch, setValue, setDeleteItem }) {
 
 	// Cost Center handlers
 	const handleCostCenterAppend = useCallback(
-		(voucherIndex) => {
+		(voucherIndex, amount) => {
 			const currentCostCenters =
 				watch(
 					`voucher_entry[${voucherIndex}].voucher_entry_cost_center`
@@ -55,7 +55,7 @@ export function useVoucherNestedEntries({ watch, setValue, setDeleteItem }) {
 					...currentCostCenters,
 					{
 						cost_center_uuid: '',
-						amount: 0,
+						amount: amount || 0,
 					},
 				]
 			);

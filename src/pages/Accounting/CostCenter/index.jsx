@@ -46,6 +46,11 @@ export default function Index() {
 				cell: (info) => info.getValue()?.replace('.', ' '),
 			},
 			{
+				accessorKey: 'remarks',
+				header: 'Remarks',
+				enableColumnFilter: false,
+			},
+			{
 				accessorKey: 'created_by_name',
 				header: 'Created By',
 				enableColumnFilter: false,
@@ -63,6 +68,7 @@ export default function Index() {
 				enableColumnFilter: false,
 				cell: (info) => <DateTime date={info.getValue()} />,
 			},
+
 			{
 				accessorKey: 'actions',
 				header: 'Actions',

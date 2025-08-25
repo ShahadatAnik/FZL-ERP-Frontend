@@ -10,7 +10,6 @@ export default function Header({
 	register,
 	errors,
 	control,
-	getValues,
 	setValue,
 	Controller,
 	watch,
@@ -18,7 +17,7 @@ export default function Header({
 }) {
 	return (
 		<SectionEntryBody
-			title='Information'
+			title={`Voucher Information: ${watch('voucher_id')}`}
 			className='grid grid-cols-3 gap-4'
 		>
 			<div className='flex gap-4'>

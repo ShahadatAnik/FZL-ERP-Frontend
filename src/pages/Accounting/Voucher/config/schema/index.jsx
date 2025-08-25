@@ -88,7 +88,7 @@ export const VOUCHER_SCHEMA = {
 							1,
 							'Amount must be greater than 0'
 						),
-						date: STRING_REQUIRED,
+						date: STRING.nullable(),
 					})
 				)
 				.optional(),
@@ -109,12 +109,14 @@ export const VOUCHER_NULLABLE = {
 			amount: 0,
 			type: 'dr',
 			voucher_entry_cost_center: [],
+			voucher_entry_payment: [],
 		},
 		{
 			ledger_uuid: null,
 			amount: 0,
 			type: 'cr',
 			voucher_entry_cost_center: [],
+			voucher_entry_payment: [],
 		},
 	],
 	remarks: null,

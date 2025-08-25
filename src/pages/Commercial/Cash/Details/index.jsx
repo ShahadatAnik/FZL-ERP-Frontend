@@ -5,6 +5,7 @@ import { useParams } from 'react-router';
 import PiPdfSheet from '@/components/Pdf/CashInvoice';
 
 import Information from './Information';
+import CashReceivesTable from './Table/CashReceives';
 import ThreadTable from './Table/ThreadTable';
 import ZipperTable from './Table/ZipperTable';
 
@@ -50,6 +51,9 @@ export default function Index() {
 					conventionRate={data?.conversion_rate}
 				/>
 			)}
+			{/* {data?.cash_receives.length > 0 && (
+				<CashReceivesTable cash_receives={data?.cash_receives} />
+			)} */}
 		</div>
 	);
 }

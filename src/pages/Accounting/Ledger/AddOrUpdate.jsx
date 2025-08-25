@@ -4,7 +4,7 @@ import { useRHF } from '@/hooks';
 
 import { AddModal } from '@/components/Modal';
 import SwitchToggle from '@/ui/Others/SwitchToggle';
-import { FormField, Input, ReactSelect } from '@/ui';
+import { FormField, Input, ReactSelect, Textarea } from '@/ui';
 
 import nanoid from '@/lib/nanoid';
 import { DevTool } from '@/lib/react-hook-devtool';
@@ -109,7 +109,7 @@ export default function Index({
 			onClose={onClose}
 		>
 			<div>
-				<div className='text-right'>
+				<div className='flex text-right'>
 					<FormField label='is_active' title='Active' errors={errors}>
 						<Controller
 							name={'is_active'}
@@ -126,104 +126,127 @@ export default function Index({
 							}}
 						/>
 					</FormField>
+					<FormField
+						label='is_cash_ledger'
+						title='Cash'
+						errors={errors}
+					>
+						<Controller
+							name={'is_cash_ledger'}
+							control={control}
+							render={({ field: { onChange } }) => {
+								return (
+									<SwitchToggle
+										onChange={(e) => {
+											onChange(e);
+										}}
+										checked={getValues('is_cash_ledger')}
+									/>
+								);
+							}}
+						/>
+					</FormField>
 				</div>
 			</div>
 			<div className='grid grid-cols-2 gap-4'>
 				<Input label='name' {...{ register, errors }} />
-				<Input label='category' {...{ register, errors }} />
-
-				<FormField
-					label='table_name'
-					title='Table Name'
-					errors={errors}
-				>
-					<Controller
-						name={'table_name'}
-						control={control}
-						render={({ field: { onChange } }) => {
-							return (
-								<ReactSelect
-									placeholder='Select Table'
-									options={tableOptions}
-									value={tableOptions?.filter(
-										(item) =>
-											item.value ==
-											getValues('table_name')
-									)}
-									onChange={(e) => {
-										onChange(e.value);
-										setValue('table_uuid', null);
-									}}
-								/>
-							);
-						}}
-					/>
-				</FormField>
-				<FormField
-					label='table_uuid'
-					title='Table Data'
-					errors={errors}
-				>
-					<Controller
-						name={'table_uuid'}
-						control={control}
-						render={({ field: { onChange } }) => {
-							return (
-								<ReactSelect
-									placeholder='Select Table Data'
-									options={tableDataOptions}
-									value={
-										tableDataOptions?.filter(
+				<div className='flex gap-2'>
+					<FormField label='type' title='Type' errors={errors}>
+						<Controller
+							name={'type'}
+							control={control}
+							render={({ field: { onChange } }) => {
+								return (
+									<ReactSelect
+										placeholder='Select Type'
+										options={typeOptions}
+										value={typeOptions?.filter(
+											(item) =>
+												item.value == getValues('type')
+										)}
+										onChange={(e) => onChange(e.value)}
+									/>
+								);
+							}}
+						/>
+					</FormField>
+					<FormField label='group_uuid' title='Group' errors={errors}>
+						<Controller
+							name={'group_uuid'}
+							control={control}
+							render={({ field: { onChange } }) => {
+								return (
+									<ReactSelect
+										placeholder='Select Group'
+										options={groupOptions}
+										value={groupOptions?.filter(
 											(item) =>
 												item.value ==
-												getValues('table_uuid')
-										) || []
-									}
-									onChange={(e) => onChange(e.value)}
-								/>
-							);
-						}}
-					/>
-				</FormField>
-				<FormField label='group_uuid' title='Group' errors={errors}>
-					<Controller
-						name={'group_uuid'}
-						control={control}
-						render={({ field: { onChange } }) => {
-							return (
-								<ReactSelect
-									placeholder='Select Group'
-									options={groupOptions}
-									value={groupOptions?.filter(
-										(item) =>
-											item.value ==
-											getValues('group_uuid')
-									)}
-									onChange={(e) => onChange(e.value)}
-								/>
-							);
-						}}
-					/>
-				</FormField>
-				<FormField label='type' title='Type' errors={errors}>
-					<Controller
-						name={'type'}
-						control={control}
-						render={({ field: { onChange } }) => {
-							return (
-								<ReactSelect
-									placeholder='Select Type'
-									options={typeOptions}
-									value={typeOptions?.filter(
-										(item) =>
-											item.value == getValues('type')
-									)}
-									onChange={(e) => onChange(e.value)}
-								/>
-							);
-						}}
-					/>
-				</FormField>
+												getValues('group_uuid')
+										)}
+										onChange={(e) => onChange(e.value)}
+									/>
+								);
+							}}
+						/>
+					</FormField>
+				</div>
+				<div className='flex gap-2'>
+					<FormField
+						label='table_name'
+						title='Table Name'
+						errors={errors}
+					>
+						<Controller
+							name={'table_name'}
+							control={control}
+							render={({ field: { onChange } }) => {
+								return (
+									<ReactSelect
+										placeholder='Select Table'
+										options={tableOptions}
+										value={tableOptions?.filter(
+											(item) =>
+												item.value ==
+												getValues('table_name')
+										)}
+										onChange={(e) => {
+											onChange(e.value);
+											setValue('table_uuid', null);
+										}}
+									/>
+								);
+							}}
+						/>
+					</FormField>
+					<FormField
+						label='table_uuid'
+						title='Table Data'
+						errors={errors}
+					>
+						<Controller
+							name={'table_uuid'}
+							control={control}
+							render={({ field: { onChange } }) => {
+								return (
+									<ReactSelect
+										placeholder='Select Table Data'
+										options={tableDataOptions}
+										value={
+											tableDataOptions?.filter(
+												(item) =>
+													item.value ==
+													getValues('table_uuid')
+											) || []
+										}
+										onChange={(e) => onChange(e.value)}
+									/>
+								);
+							}}
+						/>
+					</FormField>
+				</div>
+
 				<FormField
 					label='restrictions'
 					title='Restriction'
@@ -252,6 +275,7 @@ export default function Index({
 					<Input label='vat_deduction' {...{ register, errors }} />
 					<Input label='tax_deduction' {...{ register, errors }} />
 				</div>
+				<Textarea label='remarks' {...{ register, errors }} />
 				<FormField
 					label='is_bank_ledger'
 					title='Bank Ledger'
@@ -272,6 +296,7 @@ export default function Index({
 						}}
 					/>
 				</FormField>
+
 				{watch('is_bank_ledger') && (
 					<Input label='account_no' {...{ register, errors }} />
 				)}

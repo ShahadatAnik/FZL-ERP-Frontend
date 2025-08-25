@@ -1,3 +1,5 @@
+import { useWatch } from 'react-hook-form';
+
 import { FormField, ReactSelect } from '@/ui';
 
 import { useOtherCostCenter } from '../../config/query';
@@ -19,7 +21,8 @@ export default function CostCenter({
 			return !isSelected;
 		});
 	};
-	const watchedLedgers = watch(`voucher_entry.${p}.ledger_uuid`) || [];
+	const watchedLedgers =
+		useWatch({ control, name: `voucher_entry.${p}.ledger_uuid` }) || [];
 
 	const { data: costCenterOptions = [] } = useOtherCostCenter(
 		watchedLedgers ? `ledger_uuid=${watchedLedgers}` : ''

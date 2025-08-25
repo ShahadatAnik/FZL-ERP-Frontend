@@ -8,6 +8,8 @@ import RenderTable from '@/ui/Others/Table/RenderTable';
 
 import { DollarToWord } from '@/lib/NumToWord';
 
+import CashReceivesTable from './Table/CashReceives';
+
 export default function Information({ pi }) {
 	const {
 		uuid,
@@ -37,6 +39,7 @@ export default function Information({ pi }) {
 		receive_amount,
 		weight,
 		conversion_rate,
+		cash_receives,
 	} = pi;
 
 	const getUniqueValues = (field, arr = []) =>
@@ -255,7 +258,7 @@ export default function Information({ pi }) {
 
 	return (
 		<SectionContainer buttons={renderButtons()} title={'Information'}>
-			<div className='grid grid-cols-1 lg:grid-cols-3'>
+			<div className='grid grid-cols-1 lg:grid-cols-4'>
 				<RenderTable
 					className={'border-secondary/30 lg:border-r'}
 					title={'Basic Info'}
@@ -271,6 +274,14 @@ export default function Information({ pi }) {
 					title={'Created Details'}
 					items={renderItems().created_details}
 				/>
+				{cash_receives?.length > 0 && (
+					<div className='border border-secondary/30'>
+						<h4 className='bg-base-200 px-3 py-2 text-lg font-medium capitalize leading-tight text-primary'>
+							Cash Receives
+						</h4>
+						<CashReceivesTable cash_receives={cash_receives} />
+					</div>
+				)}
 			</div>
 		</SectionContainer>
 	);

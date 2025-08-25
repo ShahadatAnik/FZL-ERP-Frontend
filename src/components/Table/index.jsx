@@ -40,6 +40,7 @@ function Table({
 	showColumns = true,
 	showColumnsHeader = true,
 	showTitleOnly = false,
+	showWithoutTitle = false,
 	showPdf = false,
 	pdfData = null,
 	//filterTableHeader = [],
@@ -109,6 +110,9 @@ function Table({
 
 	//* Render functions
 	const renderHeader = (showTitleOnly) => {
+		if (showWithoutTitle) {
+			return;
+		}
 		if (showTitleOnly)
 			return (
 				<Suspense>

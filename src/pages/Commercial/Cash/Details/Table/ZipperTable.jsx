@@ -68,7 +68,7 @@ export default function ZipperTable({ pi, conventionRate }) {
 				accessorKey: 'pi_cash_quantity_dzn',
 				header: 'QTY (DZN)',
 				enableColumnFilter: false,
-				cell: (info) => info.getValue(),
+				cell: (info) => info.getValue().toFixed(2),
 			},
 			{
 				accessorKey: 'unit_price_pcs',
@@ -80,7 +80,7 @@ export default function ZipperTable({ pi, conventionRate }) {
 				),
 				enableColumnFilter: false,
 				cell: (info) =>
-					Number(info.getValue() * conventionRate).toFixed(4),
+					Number(info.getValue() * conventionRate).toFixed(2),
 			},
 			{
 				accessorKey: 'unit_price',
@@ -91,13 +91,13 @@ export default function ZipperTable({ pi, conventionRate }) {
 					</div>
 				),
 				enableColumnFilter: false,
-				cell: (info) => info.getValue() * conventionRate,
+				cell: (info) => (info.getValue() * conventionRate).toFixed(2),
 			},
 			{
 				accessorKey: 'value',
 				header: 'Value ($)',
 				enableColumnFilter: false,
-				cell: (info) => info.getValue(),
+				cell: (info) => info.getValue().toFixed(2),
 			},
 			{
 				accessorKey: 'remarks',
