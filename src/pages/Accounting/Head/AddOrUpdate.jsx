@@ -4,12 +4,13 @@ import { useRHF } from '@/hooks';
 
 import { AddModal } from '@/components/Modal';
 import SwitchToggle from '@/ui/Others/SwitchToggle';
-import { FormField, Input, Textarea } from '@/ui';
+import { FormField, Input, ReactSelect, Textarea } from '@/ui';
 
 import nanoid from '@/lib/nanoid';
 import { DevTool } from '@/lib/react-hook-devtool';
 import GetDateTime from '@/util/GetDateTime';
 
+import { headTypeOptions } from '../Ledger/utils';
 import { useAccHead, useAccHeadByUUID } from './config/query';
 import { HEAD_NULL, HEAD_SCHEMA } from './config/schema';
 
@@ -97,8 +98,26 @@ export default function Index({
 			onClose={onClose}
 			isSmall={true}
 		>
+			<FormField label='type' title='Type' errors={errors}>
+				<Controller
+					name={'type'}
+					control={control}
+					render={({ field: { onChange } }) => {
+						return (
+							<ReactSelect
+								placeholder='Select Type'
+								options={headTypeOptions}
+								value={headTypeOptions?.filter(
+									(item) => item.value == getValues('type')
+								)}
+								onChange={(e) => onChange(e.value)}
+							/>
+						);
+					}}
+				/>
+			</FormField>
 			<Input label='name' {...{ register, errors }} />
-			<Input label='title' {...{ register, errors }} />
+			{/* <Input label='title' {...{ register, errors }} /> */}
 
 			<div className='flex gap-2'>
 				<FormField label='bs' title='Bs' errors={errors}>

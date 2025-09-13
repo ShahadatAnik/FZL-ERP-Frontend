@@ -1453,6 +1453,11 @@ export const otherQK = {
 
 	//PI
 	pi: (query) => [...otherQK.all(), 'pi', ...(query ? [query] : [])],
+	manualPi: (query) => [
+		...otherQK.all(),
+		'manual-pi',
+		...(query ? [query] : []),
+	],
 
 	//Department
 	department: () => [...otherQK.all(), 'department'],

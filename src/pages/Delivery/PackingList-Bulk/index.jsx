@@ -523,14 +523,19 @@ export default function Index() {
 		itemId: null,
 		itemName: null,
 	});
-	const handelDelete = (idx) => {
-		setDeleteItem((prev) => ({
-			...prev,
-			itemId: data[idx].uuid,
-			itemName: data[idx].name,
-		}));
-
-		window[info.getDeleteModalId()].showModal();
+	const handelDelete = async (idx) => {
+		await updateData.mutateAsync({
+			url: `/delivery/packing-list/${data[idx]?.uuid}`,
+			updatedData: {
+				is_deleted: true,
+				deleted_by: user?.uuid,
+				deleted_time: GetDateTime(),
+				updated_at: GetDateTime(),
+				updated_by: user?.uuid,
+			},
+			uuid: data.uuid,
+			isOnCloseNeeded: false,
+		});
 	};
 
 	if (isLoading)

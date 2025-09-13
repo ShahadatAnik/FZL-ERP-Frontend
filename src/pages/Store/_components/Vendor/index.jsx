@@ -185,7 +185,7 @@ export default function Index({ type, accessor }) {
 					{...{
 						deleteItem,
 						setDeleteItem,
-						url,
+						url: '/purchase/vendor',
 						deleteData,
 					}}
 					invalidateQuery={invalidateVendor}

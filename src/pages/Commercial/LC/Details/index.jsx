@@ -25,7 +25,10 @@ export default function Index() {
 			<Information lc={data} />
 			<Table entries={data?.lc_entry} />
 			<UD entries={data?.lc_entry_others} />
-			<PI entries={data?.pi} />
+			{data?.is_old_pi === 0 && <PI entries={data?.pi} />}
+			{data?.is_old_pi === 1 && (
+				<PI entries={data?.manual_pi} manualPI={true} />
+			)}
 		</div>
 	);
 }

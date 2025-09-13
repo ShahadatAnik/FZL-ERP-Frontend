@@ -3,25 +3,32 @@ import { useMemo } from 'react';
 import ReactTableTitleOnly from '@/components/Table/ReactTableTitleOnly';
 import { CustomLink, DateTime } from '@/ui';
 
-import { dateType } from '../utils';
-
-export default function Index({ entries }) {
+export default function Index({ entries, manualPI = false }) {
 	const columns = useMemo(
 		() => [
 			{
-				accessorKey: 'id',
+				accessorFn: (row) => row.id || row.pi_number,
 				header: 'PI ID',
 				enableColumnFilter: true,
 				width: 'w-36',
 				cell: (info) => {
-					const { order_info_uuid } = info.row.original;
-					return (
-						<CustomLink
-							label={info.getValue()}
-							url={`/commercial/pi/${info.getValue()}`}
-							openInNewTab={true}
-						/>
-					);
+					if (manualPI) {
+						return (
+							<CustomLink
+								label={info.getValue()}
+								url={`/commercial/manual-pi/${info.row.original.uuid}`}
+								openInNewTab={true}
+							/>
+						);
+					} else {
+						return (
+							<CustomLink
+								label={info.getValue()}
+								url={`/commercial/pi/${info.getValue()}`}
+								openInNewTab={true}
+							/>
+						);
+					}
 				},
 			},
 			{

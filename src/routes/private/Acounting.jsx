@@ -9,10 +9,18 @@ const Ledger = lazy(() => import('@/pages/Accounting/Ledger'));
 const Voucher = lazy(() => import('@/pages/Accounting/Voucher'));
 const VoucherEntry = lazy(() => import('@/pages/Accounting/Voucher/Entry'));
 const VoucherDetails = lazy(() => import('@/pages/Accounting/Voucher/Details'));
+const NeedToAccept = lazy(() => import('@/pages/Accounting/NeedToAccept'));
 export const AccountingRoutes = [
 	{
 		name: 'Accounting',
 		children: [
+			{
+				name: 'Need To Accept',
+				path: '/accounting/need-to-accept',
+				element: <NeedToAccept />,
+				page_name: 'accounting__need_to_accept',
+				actions: ['read', 'create', 'update', 'delete'],
+			},
 			{
 				name: 'Voucher',
 				path: '/accounting/voucher',
@@ -82,6 +90,13 @@ export const AccountingRoutes = [
 			},
 			{
 				name: 'Currency',
+				path: '/accounting/currency',
+				element: <Currency />,
+				page_name: 'accounting__currency',
+				actions: ['read', 'create', 'update', 'delete'],
+			},
+			{
+				name: '',
 				path: '/accounting/currency',
 				element: <Currency />,
 				page_name: 'accounting__currency',

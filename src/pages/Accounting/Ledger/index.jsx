@@ -64,6 +64,11 @@ export default function Index() {
 				enableColumnFilter: false,
 			},
 			{
+				accessorKey: 'identifier',
+				header: 'Identifier',
+				enableColumnFilter: false,
+			},
+			{
 				accessorKey: 'category',
 				header: 'Category',
 				enableColumnFilter: false,

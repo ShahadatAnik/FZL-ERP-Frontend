@@ -50,7 +50,8 @@ export {
 
 export const HEAD_SCHEMA = {
 	name: STRING_REQUIRED,
-	title: STRING_REQUIRED,
+	// title: STRING_REQUIRED,
+	type: STRING_REQUIRED,
 	bs: BOOLEAN_DEFAULT_VALUE(false),
 	is_fixed: BOOLEAN_DEFAULT_VALUE(true),
 	remarks: STRING.nullable(),
@@ -59,6 +60,7 @@ export const HEAD_SCHEMA = {
 export const HEAD_NULL = {
 	name: '',
 	title: '',
+	type: 'assets',
 	bs: false,
 	is_fixed: true,
 	remarks: null,

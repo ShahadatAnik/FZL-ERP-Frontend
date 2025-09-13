@@ -126,7 +126,7 @@ export default function Index({
 					}}
 				/>
 			</FormField>
-			<FormField label='type' title='Type' errors={errors}>
+			{/* <FormField label='type' title='Type' errors={errors}>
 				<Controller
 					name={'type'}
 					control={control}
@@ -143,7 +143,7 @@ export default function Index({
 						);
 					}}
 				/>
-			</FormField>
+			</FormField> */}
 			<Input label='name' {...{ register, errors }} />
 			<Input label='code' {...{ register, errors }} />
 

@@ -53,7 +53,7 @@ export default function Header({
 	setDeleteLCEntryUD,
 }) {
 	const { lc_uuid } = useParams();
-	const { data: party } = useOtherParty('is_pi=true');
+	const { data: party } = useOtherParty();
 
 	return (
 		<SectionEntryBody title='LC Information'>

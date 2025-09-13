@@ -6,7 +6,7 @@ import { useAccess, useFetchForRhfReset, useRHF } from '@/hooks';
 
 import { AddModal } from '@/components/Modal';
 import { ShowLocalToast } from '@/components/Toast';
-import { FormField, ReactSelect, Textarea } from '@/ui';
+import { FormField, Input, ReactSelect, Textarea } from '@/ui';
 
 import nanoid from '@/lib/nanoid';
 import { DevTool } from '@/lib/react-hook-devtool';
@@ -139,6 +139,7 @@ export default function Index({
 			onClose={onClose}
 			isSmall={true}
 		>
+			<Input label='name' title='Issuer Name' {...{ register, errors }} />
 			<div className='flex gap-2'>
 				<FormField label='section' title='Section' errors={errors}>
 					<Controller
@@ -268,7 +269,6 @@ export default function Index({
 					}}
 				/>
 			</FormField>
-			<Textarea label='description' {...{ register, errors }} />
 			<FormField label='emergence' title='Emegence' errors={errors}>
 				<Controller
 					name={'emergence'}
@@ -291,6 +291,7 @@ export default function Index({
 					}}
 				/>
 			</FormField>
+			<Textarea label='description' rows={4} {...{ register, errors }} />
 
 			<DevTool control={control} placement='top-left' />
 		</AddModal>

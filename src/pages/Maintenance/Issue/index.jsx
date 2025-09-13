@@ -69,6 +69,11 @@ export default function Index() {
 				enableColumnFilter: false,
 			},
 			{
+				accessorKey: 'name',
+				header: 'জারি করেছেন (Issued By)',
+				enableColumnFilter: false,
+			},
+			{
 				accessorKey: 'section',
 				header: () => (
 					<>

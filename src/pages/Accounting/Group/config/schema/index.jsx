@@ -52,7 +52,7 @@ export const GROUP_SCHEMA = {
 	name: STRING_REQUIRED,
 	head_uuid: STRING_REQUIRED,
 	code: STRING_REQUIRED,
-	type: STRING_REQUIRED.default('asset'),
+	// type: STRING_REQUIRED.default('asset'),
 	is_fixed: BOOLEAN_DEFAULT_VALUE(true),
 	remarks: STRING.nullable(),
 };

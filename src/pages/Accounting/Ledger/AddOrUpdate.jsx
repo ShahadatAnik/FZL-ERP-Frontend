@@ -18,7 +18,7 @@ import {
 	useOtherTableNameBy,
 } from './config/query';
 import { LEDGER_NULL, LEDGER_SCHEMA } from './config/schema';
-import { restrictionOptions } from './utils';
+import { identifierOptions, restrictionOptions } from './utils';
 
 export default function Index({
 	modalId = '',
@@ -245,6 +245,31 @@ export default function Index({
 										(item) =>
 											item.value ==
 											getValues('restrictions')
+									)}
+									onChange={(e) => onChange(e.value)}
+								/>
+							);
+						}}
+					/>
+				</FormField>
+
+				<FormField
+					label='identifier'
+					title='Identifier'
+					errors={errors}
+				>
+					<Controller
+						name={'identifier'}
+						control={control}
+						render={({ field: { onChange } }) => {
+							return (
+								<ReactSelect
+									placeholder='Select Identifier'
+									options={identifierOptions}
+									value={identifierOptions?.filter(
+										(item) =>
+											item.value ==
+											getValues('identifier')
 									)}
 									onChange={(e) => onChange(e.value)}
 								/>

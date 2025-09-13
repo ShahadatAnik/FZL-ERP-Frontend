@@ -232,6 +232,14 @@ export const useOtherPiValues = (query) =>
 		queryKey: otherQK.pi(query),
 		url: query ? `/other/pi/value/label?${query}` : `/other/pi/value/label`,
 	});
+// GET OTHER Manual PI
+export const useOtherManualPiValues = (query) =>
+	createGlobalState({
+		queryKey: otherQK.manualPi(query),
+		url: query
+			? `/other/manual-pi/value/label?${query}`
+			: `/other/manual-pi/value/label`,
+	});
 
 // GET OTHER ORDER DESCRIPTION BY ORDER NUMBER
 export const useOtherOrderDescriptionByOrderNumber = (orderNumber) =>

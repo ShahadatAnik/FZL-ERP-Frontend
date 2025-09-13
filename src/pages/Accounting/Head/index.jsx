@@ -21,15 +21,16 @@ export default function Index() {
 	const columns = useMemo(
 		() => [
 			{
+				accessorKey: 'type',
+				header: 'Type',
+				enableColumnFilter: false,
+			},
+			{
 				accessorKey: 'name',
 				header: 'Name',
 				enableColumnFilter: false,
 			},
-			{
-				accessorKey: 'title',
-				header: 'Title',
-				enableColumnFilter: false,
-			},
+
 			{
 				accessorKey: 'bs',
 				header: 'Bs',
