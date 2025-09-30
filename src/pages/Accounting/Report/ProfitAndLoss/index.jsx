@@ -8,13 +8,13 @@ import PdfGeneratorButton from '@/components/ui/generate-pdf-button';
 import { useAccReport } from '../config/query';
 import Header from './Header';
 
-export default function index({ type }) {
+export default function index() {
 	const [from, setFrom] = useState(() => new Date());
 	const [to, setTo] = useState(() => new Date());
 	const { data, isFetching } = useAccReport(
 		format(from, 'yyyy-MM-dd'),
 		format(to, 'yyyy-MM-dd'),
-		type
+		'profit_and_loss'
 	);
 
 	const handleGeneratePDF = async () => {
@@ -28,7 +28,7 @@ export default function index({ type }) {
 				from,
 				to,
 				format(from, 'yyyy'),
-				type
+				'profit_and_loss'
 			);
 			balanceSheetPDF.open();
 			// Open the PDF

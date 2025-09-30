@@ -1,4 +1,4 @@
-import index from '@/pages/Accounting/Report/BalanceSheetAndProftLoss';
+import index from '@/pages/Accounting/Report/BalanceSheet';
 import * as yup from 'yup';
 
 import {

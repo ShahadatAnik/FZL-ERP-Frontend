@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect, useState } from 'react';
-import { useOrderDescription, useOrderDetailsByQuery } from '@/state/Order';
+import { useOrderDescription } from '@/state/Order';
 import { useAuth } from '@context/auth';
 import { FormProvider } from 'react-hook-form';
 import { Navigate, useNavigate, useParams } from 'react-router';
@@ -271,6 +271,7 @@ export default function Index() {
 				is_meter: rest?.is_meter ? 1 : 0,
 				is_cm: rest?.is_cm ? 1 : 0,
 				is_multi_color: rest?.is_multi_color ? 1 : 0,
+				is_fashion: rest?.is_fashion,
 				hand: rest?.hand,
 				updated_at: GetDateTime(),
 				updated_by: user?.uuid,
@@ -377,6 +378,7 @@ export default function Index() {
 			is_meter: rest?.is_meter ? 1 : 0,
 			is_cm: rest?.is_cm ? 1 : 0,
 			is_multi_color: rest?.is_multi_color ? 1 : 0,
+			is_fashion: rest?.is_fashion,
 			hand: rest?.hand,
 			status: 0,
 			special_requirement,

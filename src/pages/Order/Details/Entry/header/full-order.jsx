@@ -128,6 +128,14 @@ export default function Header({
 				title='Item'
 				header={
 					<div className='flex items-center gap-4'>
+						<div className='my-2 h-8 rounded-md bg-secondary px-1'>
+							<CheckBox
+								text='text-secondary-content'
+								label='is_fashion'
+								title='Fashion Zipper'
+								{...{ register, errors }}
+							/>
+						</div>
 						{watch('order_type') !== 'slider' && (
 							<div className='my-2 h-8 rounded-md bg-secondary px-1'>
 								<CheckBox

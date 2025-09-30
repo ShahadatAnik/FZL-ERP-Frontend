@@ -197,3 +197,22 @@ export default function Index({ initial_order, idx }) {
 		</div>
 	);
 }
+
+[
+	{
+		name: 'Assets',
+		children: [
+			{
+				name: 'Non current assets',
+				account_type: 'Assets', //optional
+				children: [
+					{
+						name: 'Dyeing Machinery',
+						account_tag: 'Ledger', //optional
+						children: [{ name: 'Dyeing Machinery' }],
+					},
+				],
+			},
+		],
+	},
+];

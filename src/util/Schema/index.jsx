@@ -587,6 +587,7 @@ export const ORDER_SCHEMA = {
 	// * order type
 	revision_no: NUMBER_REQUIRED.default(0),
 	is_multi_color: BOOLEAN.default(false),
+	is_fashion: BOOLEAN.default(false),
 	is_waterproof: BOOLEAN.default(false),
 	order_type: STRING_REQUIRED.default('full'),
 
@@ -716,6 +717,7 @@ export const ORDER_SCHEMA = {
 export const ORDER_NULL = {
 	revision_no: 0,
 	is_multi_color: false,
+	is_fashion: false,
 	is_waterproof: false,
 	order_type: 'full',
 	id: null,

@@ -575,6 +575,19 @@ export const DetailsColumns = ({
 				),
 			},
 			{
+				accessorKey: 'is_fashion',
+				header: (
+					<>
+						Fashion <br />
+						Zipper
+					</>
+				),
+				enableColumnFilter: false,
+				cell: (info) => (
+					<StatusButton size='btn-xs' value={info.getValue()} />
+				),
+			},
+			{
 				accessorFn: (row) => {
 					if (row.order_type === 'tape') return 'MTR';
 					return row.is_inch ? 'INCH' : 'CM';
